@@ -175,7 +175,7 @@ const Dashboard = () => {
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         
         {/* HEADER: No mobile, já aparece a logo aqui em cima, então não precisamos da outra em baixo */}
-        <header className="flex flex-col items-start mb-12 w-full">
+        <header>
           <div className="flex items-center gap-3 mb-4">
             <MoneyPlanLogo size="lg" />
             <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
