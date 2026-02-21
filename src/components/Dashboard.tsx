@@ -143,16 +143,30 @@ const Dashboard = () => {
         onSelectConversation={handleSelectConversation}
         onDeleteConversation={handleDeleteConversation}
       />
-
-      {/* Background Effects */}
+  {/* Background Effects - Spotlight Style */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '-3s' }} />
+        
+        {/* 1. O SPOTLIGHT (A luz verde principal no topo) */}
+        {/* Cria um gradiente radial que vai do verde neon (primary) para transparente */}
         <div 
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[120%] h-[600px] rounded-[100%] bg-primary/10 blur-[100px]" 
+        />
+
+        {/* 2. LUZ SECUNDÁRIA (Roxa/Secondary) - Para profundidade no canto inferior */}
+        <div 
+          className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px]" 
+        />
+
+        {/* 3. O GRID (Grade) - Com efeito de desvanecer (Fade Out) */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: 'linear-gradient(hsl(220 20% 18%) 1px, transparent 1px), linear-gradient(90deg, hsl(220 20% 18%) 1px, transparent 1px)',
+            // Usei var(--primary) para os riscos serem levemente esverdeados em vez de cinza
+            backgroundImage: 'linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)',
             backgroundSize: '50px 50px',
+            // O TRUQUE DE OURO: Isso faz o grid aparecer no topo e sumir embaixo
+            maskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)'
           }}
         />
       </div>
