@@ -34,25 +34,39 @@ const iconMap: Record<string, React.ElementType> = {
 // 1. ALTERAÇÃO AQUI: Melhorei as cores e adicionei a propriedade 'text' que faltava
 const tierStyles = {
   bronze: {
-    bg: "bg-gradient-to-b from-amber-800/20 to-amber-900/40",
-    border: "border-amber-700/50 border-b-4", // Borda inferior mais grossa para efeito 3D
-    icon: "text-amber-500",
-    text: "text-amber-500",
-    glow: "group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+    // Fundo: Um marrom alaranjado muito suave e transparente que desvanece para o fundo do app
+    bg: "bg-gradient-to-b from-orange-500/10 via-orange-900/5 to-transparent",
+    // Borda: Laranja escuro, sutil
+    border: "border-orange-500/20 border-b-orange-600/50 border-b-4",
+    // Ícone: Laranja vibrante
+    icon: "text-orange-500",
+    text: "text-orange-400",
+    // Glow: Sombra laranja suave
+    glow: "group-hover:shadow-[0_0_30px_rgba(249,115,22,0.15)]"
   },
+  
   silver: {
-    bg: "bg-gradient-to-b from-slate-700/20 to-slate-800/40",
-    border: "border-slate-500/50 border-b-4",
+    // Fundo: Branco/Azulado transparente (frio)
+    bg: "bg-gradient-to-b from-slate-400/10 via-slate-800/5 to-transparent",
+    // Borda: Cinza metálico
+    border: "border-slate-400/20 border-b-slate-500/50 border-b-4",
+    // Ícone: Prata claro
     icon: "text-slate-300",
     text: "text-slate-300",
-    glow: "group-hover:shadow-[0_0_20px_rgba(203,213,225,0.2)]"
+    // Glow: Sombra branca/azulada
+    glow: "group-hover:shadow-[0_0_30px_rgba(148,163,184,0.15)]"
   },
+  
   gold: {
-    bg: "bg-gradient-to-b from-yellow-700/20 to-yellow-900/40",
-    border: "border-yellow-600/50 border-b-4",
+    // Fundo: Amarelo/Dourado transparente (quente e rico)
+    bg: "bg-gradient-to-b from-yellow-400/10 via-yellow-900/5 to-transparent",
+    // Borda: Ouro forte
+    border: "border-yellow-400/20 border-b-yellow-500/50 border-b-4",
+    // Ícone: Ouro vibrante
     icon: "text-yellow-400",
     text: "text-yellow-400",
-    glow: "group-hover:shadow-[0_0_20px_rgba(250,204,21,0.3)]"
+    // Glow: Sombra dourada mais forte que as outras
+    glow: "group-hover:shadow-[0_0_30px_rgba(250,204,21,0.2)]"
   },
 };
 
