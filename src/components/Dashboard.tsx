@@ -175,19 +175,34 @@ const Dashboard = () => {
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         
         {/* HEADER: No mobile, já aparece a logo aqui em cima, então não precisamos da outra em baixo */}
-        <header>
-          <div className="flex items-center gap-3 mb-4">
-            <MoneyPlanLogo size="lg" />
-            <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
-              <span className="text-primary text-glow-emerald">Money</span>
-              <span className="text-foreground">Plan</span>
-              <span className="text-primary text-glow-emerald">$</span>
-            </h1>
-          </div>
-          <p className="text-muted-foreground text-lg text-left">
-            Gestão de Patrimônio Inteligente
-          </p>
-        </header>
+        {/* HEADER COM STREAK NO CANTO DIREITO */}
+<header className="flex items-start justify-between w-full mb-12">
+  
+  {/* LADO ESQUERDO: Logo e Título */}
+  <div className="flex flex-col items-start">
+    <div className="flex items-center gap-3 mb-2">
+      <MoneyPlanLogo size="lg" />
+      <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
+        <span className="text-primary text-glow-emerald">Money</span>
+        <span className="text-foreground">Plan</span>
+        <span className="text-primary">$</span>
+      </h1>
+    </div>
+    <p className="text-muted-foreground text-lg text-left">
+      Gestão de Patrimônio Inteligente
+    </p>
+  </div>
+
+  {/* LADO DIREITO: O Streak (Ancorado aqui) */}
+  <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-md transition-transform hover:scale-105 cursor-help" title="Dias seguidos focando nas finanças">
+    <span className="text-xl">🔥</span>
+    <div className="flex flex-col items-start">
+      <span className="text-lg font-bold text-orange-500 leading-none">4</span>
+      <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Dias</span>
+    </div>
+  </div>
+
+</header>
         
         <WealthWidget 
           className="mb-6" 
