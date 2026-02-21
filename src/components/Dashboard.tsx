@@ -195,7 +195,7 @@ const Dashboard = () => {
 
   {/* LADO DIREITO: O Streak (Ancorado aqui) */}
   <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-md transition-transform hover:scale-105 cursor-help" title="Dias seguidos focando nas finanças">
-    <span className="text-xl">🔥</span>
+    <span className="text-xl">⚡</span>
     <div className="flex flex-col items-start">
       <span className="text-lg font-bold text-orange-500 leading-none">4</span>
       <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Dias</span>
