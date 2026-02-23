@@ -52,7 +52,7 @@ export function NavSidebar() {
         {/* Grupo A: Navegação Principal */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-2">
-            Navegação
+            Abas
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
