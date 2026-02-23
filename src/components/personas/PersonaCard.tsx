@@ -20,36 +20,40 @@ export function PersonaCard({ persona }: PersonaCardProps) {
 
 if (persona.isLocked) {
     return (
-      <div className="glass-card p-6 opacity-100 relative overflow-hidden cursor-not-allowed border-muted border-[0.5px] border-opacity-10 group">
-        {/* Locked Overlay sem borrões e com Neon */}
+      <div className="glass-card p-6 opacity-100 relative overflow-hidden cursor-not-allowed border-muted border-opacity-10 group">
+        
+        {/* Overlay de Bloqueio - Sem barras '/' para não quebrar o build */}
         <div className="absolute inset-0 bg-black bg-opacity-60 z-20 flex flex-col items-center justify-center gap-3">
           <div className="relative">
-            {/* Ícone de Cadeado Neon - Usando drop-shadow padrão do Tailwind para evitar erro de parse */}
-            <Lock className="w-10 h-10 text-primary animate-pulse drop-shadow-[0_0_10px_rgba(16,185,129,1)]" />
+            {/* Cadeado Neon com drop-shadow seguro */}
+            <Lock 
+              className="w-10 h-10 text-primary animate-pulse" 
+              style={{ filter: 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.9))' }}
+            />
             
-            {/* Aura de brilho atrás do cadeado usando opacidade via classe dedicada */}
+            {/* Brilho de fundo (Glow) */}
             <div className="absolute inset-0 bg-primary bg-opacity-20 blur-2xl rounded-full -z-10"></div>
           </div>
           
-          <p className="text-[10px] font-bold text-primary uppercase tracking-widest drop-shadow-[0_0_5px_rgba(16,185,129,0.8)]">
+          <p className="text-[10px] font-bold text-primary uppercase tracking-widest" style={{ filter: 'drop-shadow(0 0 5px rgba(16, 185, 129, 0.6))' }}>
             Bloqueado
           </p>
         </div>
 
-        {/* Conteúdo do Card - Nítido, mas levemente escurecido */}
-        <div className="flex flex-col items-center text-center gap-4 grayscale-[0.3]">
+        {/* Conteúdo do Card - Nítido e sem borrões */}
+        <div className="flex flex-col items-center text-center gap-4 grayscale-[0.4]">
           <div className="p-4 rounded-full bg-muted bg-opacity-10 text-muted-foreground">
             <persona.icon size={32} />
           </div>
           <h3 className="text-xl font-bold text-muted-foreground">{persona.name}</h3>
-          <p className="text-sm text-muted-foreground opacity-50 leading-relaxed">
+          <p className="text-sm text-muted-foreground opacity-60 leading-relaxed">
             {persona.description}
           </p>
           
           <div className="flex items-center gap-2 mt-2">
              <Lock className="w-3 h-3 text-muted-foreground opacity-40" />
              <span className="text-[10px] text-muted-foreground opacity-40">
-               Desbloqueie com {persona.requiredStreak} dias de streak
+               {persona.requiredStreak} dias de streak
              </span>
           </div>
         </div>
