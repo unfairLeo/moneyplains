@@ -177,12 +177,13 @@ const Dashboard = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         
-        {/* HEADER: No mobile, já aparece a logo aqui em cima, então não precisamos da outra em baixo */}
-        {/* HEADER COM STREAK NO CANTO DIREITO */}
-<header className="flex items-start justify-between w-full mb-12">
+{/* --- CÓDIGO DO NOVO HEADER PARA O DASHBOARD.TSX --- */}
+
+<header className="flex flex-col md:flex-row items-center justify-between w-full mb-8 gap-4">
   
   {/* LADO ESQUERDO: Logo e Título */}
-  <div className="flex flex-col items-start">
+  {/* Removi o 'items-center' global para alinhar melhor texto e logo */}
+  <div className="flex flex-col items-center md:items-start">
     <div className="flex items-center gap-3 mb-2">
       <MoneyPlanLogo size="lg" />
       <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
@@ -191,17 +192,24 @@ const Dashboard = () => {
         <span className="text-primary">$</span>
       </h1>
     </div>
-    <p className="text-muted-foreground text-lg text-left">
+    <p className="text-muted-foreground text-lg">
       Gestão de Patrimônio Inteligente
     </p>
   </div>
 
-  {/* LADO DIREITO: O Streak (Ancorado aqui) */}
-  <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-md transition-transform hover:scale-105 cursor-help" title="Dias seguidos focando nas finanças">
-    <span className="text-xl">⚡</span>
+  {/* LADO DIREITO: O Streak (Foguinho) Agora Fixo Aqui */}
+  <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-md transition-transform hover:scale-105 cursor-help" title="Dias seguidos focando nas finanças">
+    <div className="relative">
+      <span className="text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">🔥</span>
+      {/* Efeito de pulso no fogo */}
+      <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full animate-pulse"></div>
+    </div>
+    
     <div className="flex flex-col items-start">
-      <span className="text-lg font-bold text-orange-500 leading-none">4</span>
-      <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">Dias</span>
+      <span className="text-lg font-bold text-orange-500 leading-none">5</span>
+      <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">
+        Dias
+      </span>
     </div>
   </div>
 
