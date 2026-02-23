@@ -29,7 +29,6 @@ if (persona.isLocked) {
           <div className="p-4 rounded-full bg-background/80 shadow-xl border border-white/5">
             <Lock className="w-8 h-8 text-muted-foreground/50" />
           </div>
-        </div>
 
         {/* Conteúdo do Card - Nítido e sem borrões */}
         <div className="flex flex-col items-center text-center gap-4 grayscale-[0.4]">
