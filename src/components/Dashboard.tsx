@@ -218,6 +218,7 @@ const Dashboard = () => {
         <WealthWidget 
           className="mb-6" 
           netWorth={response?.net_worth}
+          chartData={response?.charts?.[0]?.data}
         />
 
         {/* Query Input */}
