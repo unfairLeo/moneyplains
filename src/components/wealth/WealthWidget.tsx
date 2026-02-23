@@ -25,6 +25,7 @@ export function WealthWidget({
   chartData = [], // Recebe os dados da IA
 }: WealthWidgetProps) {
   const [activeRange, setActiveRange] = useState("total");
+  console.log("DADOS CHEGANDO NO GRAFICO:", chartData);
 
   // 2. LÓGICA INTELIGENTE:
   // Se a IA mandou dados (chartData), usa eles.
