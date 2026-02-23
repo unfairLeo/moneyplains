@@ -114,8 +114,11 @@ const Dashboard = () => {
     }
   };
 
+// 🟢 Parte alterada
   const handleSelectConversation = (id: string) => {
-    const conversation = getConversation(id);
+    // Busca direta na lista de histórico para garantir que pega o dado mais atual
+    const conversation = history.find((item) => item.id === id);
+    
     if (conversation) {
       setSelectedConversationId(id);
       setResponse(conversation.response);
