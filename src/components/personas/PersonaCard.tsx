@@ -20,16 +20,33 @@ export function PersonaCard({ persona }: PersonaCardProps) {
 
 if (persona.isLocked) {
     return (
-      // 1. Aumentamos a opacidade de 60 para 80 ou 90 para o card não sumir no fundo
-      <div className="glass-card p-6 opacity-90 relative overflow-hidden cursor-not-allowed border-muted/20">
-        
-        {/* Locked Overlay */}
-        {/* 2. Removemos o 'backdrop-blur' e usamos um fundo preto bem transparente 'bg-black/20' */}
-        <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center">
-          <div className="p-4 rounded-full bg-background/80 shadow-xl border border-white/5">
-            <Lock className="w-8 h-8 text-muted-foreground/50" />
+      <div className="glass-card p-6 opacity-100 relative overflow-hidden cursor-not-allowed border-muted/10 group">
+        {/* Locked Overlay com brilho neon */}
+        <div className="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center gap-3 backdrop-none">
+          <div className="relative">
+            {/* Ícone de Cadeado Neon */}
+            <Lock className="w-10 h-10 text-primary animate-pulse filter drop-shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
+            
+            {/* Aura de brilho atrás do cadeado */}
+            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full -z-10"></div>
           </div>
+          
+          <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] drop-shadow-[0_0_5px_rgba(16,185,129,0.6)]">
+            Bloqueado
+          </p>
         </div>
+
+        {/* Conteúdo do Card (Fica visível, mas escurecido pelo overlay acima) */}
+        <div className="flex flex-col items-center text-center gap-4 filter grayscale-[0.5]">
+          <div className="p-4 rounded-full bg-muted/20 text-muted-foreground">
+            <persona.icon size={32} />
+          </div>
+          <h3 className="text-xl font-bold text-muted-foreground">{persona.name}</h3>
+          <p className="text-sm text-muted-foreground/50">{persona.description}</p>
+        </div>
+      </div>
+    );
+  }
 
         {/* Badge */}
         <Badge 
