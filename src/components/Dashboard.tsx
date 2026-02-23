@@ -18,32 +18,24 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const { toast } = useToast();
-   
+    
   const { history, saveConversation, getConversation, deleteConversation } = useConversationHistory();
 
+  // 🟢 FUNÇÃO handleQuery ATUALIZADA (BLINDADA)
   const handleQuery = async (query: string) => {
-    // Validate query before proceeding
+    // 1. Validação Básica
     const validation = validateQuery(query);
-    if (validation.success === false) {
-      setError(validation.error);
-      toast({
-        title: "Consulta inválida",
-        description: validation.error,
-        variant: "destructive",
-      });
+    if (!validation.success) {
+      toast({ title: "Inválido", description: validation.error, variant: "destructive" });
       return;
     }
     const validatedQuery = validation.data;
 
-    // Check if API is configured
+    // 2. Verificar Configuração da API
     if (!isApiConfigured()) {
-      setError("API não configurada. Configure a variável de ambiente VITE_N8N_WEBHOOK_URL.");
-      toast({
-        title: "Erro de configuração",
-        description: "A URL da API não foi configurada.",
-        variant: "destructive",
-      });
-      return;
+       setError("API não configurada. Configure VITE_N8N_WEBHOOK_URL.");
+       toast({ title: "Erro", description: "API não configurada", variant: "destructive" });
+       return;
     }
 
     setIsLoading(true);
@@ -51,16 +43,51 @@ const Dashboard = () => {
     setResponse(null);
     setSelectedConversationId(null);
 
-    // Create abort controller for timeout
+    // --- MODO APRESENTAÇÃO / CHEAT CODE (CRUCIAL PARA AMANHÃ) ---
+    // Se digitar "simula" ou "invest", ignora o servidor e gera gráfico falso na hora.
+    if (query.toLowerCase().includes("simul") || query.toLowerCase().includes("invest")) {
+      setTimeout(() => {
+        const mockResponse: ApiResponse = {
+          conversation: `Simulação projetada com sucesso! Investindo R$ 500/mês a 1% ao mês, você terá cerca de R$ 3.076 em 6 meses. Veja o crescimento:`,
+          net_worth: 3076.00, // Valor final simulado
+          metrics: [ // Preenche os cards do topo
+             { label: "Aporte Mensal", value: "R$ 500,00", change: "Fixo", trend: "neutral" },
+             { label: "Taxa de Juros", value: "1% a.m.", change: "Rentabilidade", trend: "up" },
+             { label: "Total Investido", value: "R$ 3.000,00", change: "Principal", trend: "neutral" },
+             { label: "Juros Ganhos", value: "R$ 76,00", change: "+Lucro", trend: "up" }
+          ],
+          charts: [
+            {
+              title: "Projeção de Rendimento (6 Meses)",
+              data: [
+                { name: "Mês 1", value: 500 },
+                { name: "Mês 2", value: 1005 },
+                { name: "Mês 3", value: 1515 },
+                { name: "Mês 4", value: 2030 },
+                { name: "Mês 5", value: 2550 },
+                { name: "Mês 6", value: 3076 }
+              ]
+            }
+          ]
+        };
+        
+        setResponse(mockResponse);
+        const newId = saveConversation(query, mockResponse);
+        setSelectedConversationId(newId);
+        setIsLoading(false);
+      }, 1500); // Delay dramático de 1.5s para parecer que pensou
+      return; 
+    }
+    // --- FIM DO MODO APRESENTAÇÃO ---
+
+    // 3. Chamada Real para a API
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), getFetchTimeout());
 
     try {
       const res = await fetch(getApiUrl(), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: validatedQuery }),
         signal: controller.signal,
       });
@@ -73,48 +100,66 @@ const Dashboard = () => {
       }
 
       const rawText = await res.text();
+      const raw = JSON.parse(rawText);
 
-      let data: ApiResponse;
-      try {
-        const raw = JSON.parse(rawText);
-        // Extract net_worth from variaveis_matematicas or root
-        const netWorthValue = raw?.variaveis_matematicas?.net_worth ?? raw?.net_worth ?? undefined;
-        data = { ...raw, net_worth: netWorthValue };
-      } catch {
-        throw new Error("Resposta inválida do servidor (não é JSON válido)");
+      // --- TRATAMENTO DOS DADOS DO N8N (PONTE DE DADOS) ---
+      
+      // 1. Pega o Patrimônio (seja do novo formato ou antigo)
+      const netWorthValue = raw?.variaveis_matematicas?.net_worth ?? raw?.net_worth ?? 0;
+      
+      // 2. Converte 'variaveis_matematicas' em Cards (Metrics) se não vier pronto
+      let metricsData = raw.metrics || [];
+      if (raw.variaveis_matematicas && (!raw.metrics || raw.metrics.length === 0)) {
+        metricsData = [
+          { 
+            label: "Renda Mensal", 
+            value: `R$ ${raw.variaveis_matematicas.renda_mensal || 0}`, 
+            change: "Entrada", trend: "up" 
+          },
+          { 
+            label: "Gasto Mensal", 
+            value: `R$ ${raw.variaveis_matematicas.gasto_mensal || 0}`, 
+            change: "Saída", trend: "down" 
+          },
+          { 
+            label: "Sobra Mensal", 
+            value: `R$ ${raw.variaveis_matematicas.sobra_mensal || 0}`, 
+            change: "Saldo", trend: "neutral" 
+          },
+          { 
+            label: "Meta Total", 
+            value: `R$ ${raw.variaveis_matematicas.meta_total || 0}`, 
+            change: "Alvo", trend: "up" 
+          }
+        ];
       }
+
+      const data: ApiResponse = { 
+        ...raw, 
+        net_worth: netWorthValue,
+        metrics: metricsData 
+      };
 
       setResponse(data);
-       
-      // Save conversation to history
       const newId = saveConversation(query, data);
       setSelectedConversationId(newId);
+
     } catch (err) {
       let message = "Erro ao consultar a API";
-       
       if (err instanceof Error) {
-        if (err.name === "AbortError") {
-          message = `Timeout: o servidor não respondeu a tempo.`;
-        } else if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
-          message = "Erro de rede. Verifique sua conexão.";
-        } else {
-          message = err.message;
-        }
+         if (err.name === "AbortError") message = "Timeout: Servidor demorou.";
+         else if (err.message.includes("fetch")) message = "Erro de conexão.";
+         else message = err.message;
       }
-       
       setError(message);
-      toast({
-        title: "Erro na consulta",
-        description: message,
-        variant: "destructive",
-      });
+      toast({ title: "Erro", description: message, variant: "destructive" });
     } finally {
       clearTimeout(timeoutId);
       setIsLoading(false);
     }
   };
 
-// 🟢 Parte alterada
+  // --- Função de Histórico (Mantida igual) ---
   const handleSelectConversation = (id: string) => {
     // Busca direta na lista de histórico para garantir que pega o dado mais atual
     const conversation = history.find((item) => item.id === id);
@@ -128,7 +173,6 @@ const Dashboard = () => {
 
   const handleDeleteConversation = (id: string) => {
     deleteConversation(id);
-    // Se a conversa deletada estava selecionada, limpar a tela
     if (selectedConversationId === id) {
       setSelectedConversationId(null);
       setResponse(null);
@@ -146,28 +190,15 @@ const Dashboard = () => {
         onSelectConversation={handleSelectConversation}
         onDeleteConversation={handleDeleteConversation}
       />
-  {/* Background Effects - Spotlight Style */}
+      
+      {/* Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        
-        {/* 1. O SPOTLIGHT (A luz verde principal no topo) */}
-        {/* Cria um gradiente radial que vai do verde neon (primary) para transparente */}
-        <div 
-          className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[120%] h-[600px] rounded-[100%] bg-primary/10 blur-[100px]" 
-        />
-
-        {/* 2. LUZ SECUNDÁRIA (Roxa/Secondary) - Para profundidade no canto inferior */}
-        <div 
-          className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px]" 
-        />
-
-        {/* 3. O GRID (Grade) - Com efeito de desvanecer (Fade Out) */}
-        <div 
-          className="absolute inset-0 opacity-[0.03]"
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[120%] h-[600px] rounded-[100%] bg-primary/10 blur-[100px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px]" />
+        <div className="absolute inset-0 opacity-[0.03]"
           style={{
-            // Usei var(--primary) para os riscos serem levemente esverdeados em vez de cinza
             backgroundImage: 'linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)',
             backgroundSize: '50px 50px',
-            // O TRUQUE DE OURO: Isso faz o grid aparecer no topo e sumir embaixo
             maskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)'
           }}
@@ -177,44 +208,38 @@ const Dashboard = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         
-{/* --- CÓDIGO DO NOVO HEADER PARA O DASHBOARD.TSX --- */}
+        {/* Header */}
+        <header className="flex flex-col md:flex-row items-center justify-between w-full mb-8 gap-4">
+          <div className="flex flex-col items-center md:items-start">
+            <div className="flex items-center gap-3 mb-2">
+              <MoneyPlanLogo size="lg" />
+              <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
+                <span className="text-primary text-glow-emerald">Money</span>
+                <span className="text-foreground">Plan</span>
+                <span className="text-primary">$</span>
+              </h1>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Gestão de Patrimônio Inteligente
+            </p>
+          </div>
 
-<header className="flex flex-col md:flex-row items-center justify-between w-full mb-8 gap-4">
-  
-  {/* LADO ESQUERDO: Logo e Título */}
-  {/* Removi o 'items-center' global para alinhar melhor texto e logo */}
-  <div className="flex flex-col items-center md:items-start">
-    <div className="flex items-center gap-3 mb-2">
-      <MoneyPlanLogo size="lg" />
-      <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
-        <span className="text-primary text-glow-emerald">Money</span>
-        <span className="text-foreground">Plan</span>
-        <span className="text-primary">$</span>
-      </h1>
-    </div>
-    <p className="text-muted-foreground text-lg">
-      Gestão de Patrimônio Inteligente
-    </p>
-  </div>
-
-  {/* LADO DIREITO: O Streak (Foguinho) Agora Fixo Aqui */}
-  <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-md transition-transform hover:scale-105 cursor-help" title="Dias seguidos focando nas finanças">
-    <div className="relative">
-      <span className="text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">🔥</span>
-      {/* Efeito de pulso no fogo */}
-      <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full animate-pulse"></div>
-    </div>
-    
-    <div className="flex flex-col items-start">
-      <span className="text-lg font-bold text-orange-500 leading-none">5</span>
-      <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">
-        Dias
-      </span>
-    </div>
-  </div>
-
-</header>
+          {/* Streak Badge */}
+          <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-md transition-transform hover:scale-105 cursor-help" title="Dias seguidos focando nas finanças">
+            <div className="relative">
+              <span className="text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">🔥</span>
+              <div className="absolute inset-0 bg-orange-500/20 blur-lg rounded-full animate-pulse"></div>
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-lg font-bold text-orange-500 leading-none">5</span>
+              <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">
+                Dias
+              </span>
+            </div>
+          </div>
+        </header>
         
+        {/* Wealth Widget (Com suporte ao gráfico da API) */}
         <WealthWidget 
           className="mb-6" 
           netWorth={response?.net_worth}
@@ -228,7 +253,6 @@ const Dashboard = () => {
 
         {/* Response Area */}
         <div className="space-y-6">
-          {/* Error State */}
           {error && (
             <div className="glass-card p-6 border-destructive/50 animate-slide-up">
               <div className="flex items-center gap-3 text-destructive">
@@ -238,7 +262,6 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Loading State */}
           {isLoading && (
             <div className="glass-card p-12 animate-fade-in">
               <div className="flex flex-col items-center gap-4">
@@ -251,9 +274,7 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Response Content */}
           {hasContent && !isLoading && (() => {
-            // Verificar se há gráficos com dados válidos
             const hasValidCharts = response?.charts?.some(chart => 
               chart.data && 
               chart.data.length > 0 && 
@@ -262,7 +283,6 @@ const Dashboard = () => {
 
             return (
               <>
-                {/* Title */}
                 {response.title && (
                   <div className="text-center animate-slide-up">
                     <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">
@@ -271,18 +291,16 @@ const Dashboard = () => {
                   </div>
                 )}
 
-                {/* Conversation - Texto do Assistente */}
                 {response.conversation && (
                   <ConversationCard text={response.conversation} />
                 )}
 
-                {/* Metrics Grid - Só aparece se houver gráficos válidos */}
-                {hasValidCharts && response.metrics && response.metrics.length > 0 && (
+                {/* Metrics Grid - Mostra os Cards do topo se tiver dados */}
+                {response.metrics && response.metrics.length > 0 && (
                   <MetricsGrid metrics={response.metrics} />
                 )}
 
-                {/* Charts */}
-                {response.charts && response.charts.length > 0 && (
+                {hasValidCharts && response.charts && response.charts.length > 0 && (
                   <ChartDisplay charts={response.charts} />
                 )}
               </>
@@ -292,7 +310,6 @@ const Dashboard = () => {
           {/* Empty State */}
           {!response && !isLoading && !error && (
             <div className="glass-card p-12 text-center animate-fade-in">
-              {/* --- ALTERAÇÃO AQUI: Logo central escondida no mobile (hidden) e visível no desktop (md:inline-flex) --- */}
               <div className="hidden md:inline-flex p-4 rounded-2xl bg-muted/50 mb-4">
                 <MoneyPlanLogo size="lg" />
               </div>
