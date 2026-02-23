@@ -29,27 +29,7 @@ if (persona.isLocked) {
           <div className="p-4 rounded-full bg-background/80 shadow-xl border border-white/5">
             <Lock className="w-8 h-8 text-muted-foreground/50" />
           </div>
-
-        {/* Conteúdo do Card - Nítido e sem borrões */}
-        <div className="flex flex-col items-center text-center gap-4 grayscale-[0.4]">
-          <div className="p-4 rounded-full bg-muted bg-opacity-10 text-muted-foreground">
-            <persona.icon size={32} />
-          </div>
-          <h3 className="text-xl font-bold text-muted-foreground">{persona.name}</h3>
-          <p className="text-sm text-muted-foreground opacity-60 leading-relaxed">
-            {persona.description}
-          </p>
-          
-          <div className="flex items-center gap-2 mt-2">
-             <Lock className="w-3 h-3 text-muted-foreground opacity-40" />
-             <span className="text-[10px] text-muted-foreground opacity-40">
-               {persona.requiredStreak} dias de streak
-             </span>
-          </div>
         </div>
-      </div>
-    );
-  }
 
         {/* Badge */}
         <Badge 
