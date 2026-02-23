@@ -20,24 +20,15 @@ export function PersonaCard({ persona }: PersonaCardProps) {
 
 if (persona.isLocked) {
     return (
-      <div className="glass-card p-6 opacity-100 relative overflow-hidden cursor-not-allowed border-muted border-opacity-10 group">
+      // 1. Aumentamos a opacidade de 60 para 80 ou 90 para o card não sumir no fundo
+      <div className="glass-card p-6 opacity-90 relative overflow-hidden cursor-not-allowed border-muted/20">
         
-        {/* Overlay de Bloqueio - Sem barras '/' para não quebrar o build */}
-        <div className="absolute inset-0 bg-black bg-opacity-60 z-20 flex flex-col items-center justify-center gap-3">
-          <div className="relative">
-            {/* Cadeado Neon com drop-shadow seguro */}
-            <Lock 
-              className="w-10 h-10 text-primary animate-pulse" 
-              style={{ filter: 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.9))' }}
-            />
-            
-            {/* Brilho de fundo (Glow) */}
-            <div className="absolute inset-0 bg-primary bg-opacity-20 blur-2xl rounded-full -z-10"></div>
+        {/* Locked Overlay */}
+        {/* 2. Removemos o 'backdrop-blur' e usamos um fundo preto bem transparente 'bg-black/20' */}
+        <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center">
+          <div className="p-4 rounded-full bg-background/80 shadow-xl border border-white/5">
+            <Lock className="w-8 h-8 text-muted-foreground/50" />
           </div>
-          
-          <p className="text-[10px] font-bold text-primary uppercase tracking-widest" style={{ filter: 'drop-shadow(0 0 5px rgba(16, 185, 129, 0.6))' }}>
-            Bloqueado
-          </p>
         </div>
 
         {/* Conteúdo do Card - Nítido e sem borrões */}
