@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { User, Bot, Sparkles } from "lucide-react"; // Adicionei ícones para o chat
+import { User, Bot, Sparkles, Send } from "lucide-react"; 
 import QueryInput from "./QueryInput";
 import ChartDisplay from "./ChartDisplay";
 import MetricsGrid from "./MetricsGrid";
@@ -10,7 +10,7 @@ import { useConversationHistory } from "@/hooks/useConversationHistory";
 import { validateQuery, isApiConfigured, getApiUrl, getFetchTimeout } from "@/lib/api";
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
 
-// Definindo o tipo de cada balão de fala
+// --- TIPO DAS MENSAGENS DO CHAT ---
 type ChatMessage = {
   role: 'user' | 'assistant';
   content?: string;
@@ -21,15 +21,17 @@ type ChatMessage = {
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]); // Lista de mensagens
+  const [messages, setMessages] = useState<ChatMessage[]>([]); // Lista que cresce (Scroll)
   const [error, setError] = useState<string | null>(null);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   
-  const scrollRef = useRef<HTMLDivElement>(null); // Para rolar a tela automaticamente
+  // Ref para forçar o scroll para baixo
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
   const { toast } = useToast();
   const { history, saveConversation, deleteConversation } = useConversationHistory();
 
-  // Rolar para baixo sempre que chegar mensagem nova
+  // Efeito: Rola para o fim sempre que mensagens mudam
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
@@ -37,10 +39,11 @@ const Dashboard = () => {
   }, [messages, isLoading]);
 
   const handleQuery = async (query: string) => {
-    // 1. Adiciona a mensagem do usuário na tela NA HORA
+    // 1. Joga a mensagem do usuário na tela IMEDIATAMENTE
     const userMessage: ChatMessage = { role: 'user', content: query };
     setMessages(prev => [...prev, userMessage]);
 
+    // Validação
     const validation = validateQuery(query);
     if (!validation.success) {
       toast({ title: "Inválido", description: validation.error, variant: "destructive" });
@@ -55,21 +58,22 @@ const Dashboard = () => {
     setIsLoading(true);
     setError(null);
 
-    // --- MODO APRESENTAÇÃO (Cheat Code) ---
+    // --- MODO APRESENTAÇÃO (SIMULAÇÃO) ---
+    // Se digitar "simul" ou "invest", cria resposta falsa bonita
     if (query.toLowerCase().includes("simul") || query.toLowerCase().includes("invest")) {
       setTimeout(() => {
         const mockResponse = {
-          conversation: `Simulação projetada com sucesso! Investindo R$ 500/mês a 1% ao mês, você terá um crescimento exponencial.`,
+          conversation: `Simulação projetada com sucesso! Com aportes de R$ 500,00, veja o crescimento:`,
           metrics: [
-             { label: "Total Investido", value: "R$ 3.000,00", change: "Principal", trend: "neutral" },
-             { label: "Juros Ganhos", value: "R$ 76,00", change: "+Lucro", trend: "up" }
+             { label: "Investido", value: "R$ 3.000,00", change: "Total", trend: "neutral" },
+             { label: "Retorno", value: "R$ 76,00", change: "+1.2%", trend: "up" }
           ],
           charts: [{
-              title: "Projeção de Rendimento",
+              title: "Projeção 6 Meses",
               data: [
-                { name: "Mês 1", value: 500 }, { name: "Mês 2", value: 1005 },
-                { name: "Mês 3", value: 1515 }, { name: "Mês 4", value: 2030 },
-                { name: "Mês 5", value: 2550 }, { name: "Mês 6", value: 3076 }
+                { name: "Mês 1", value: 500 }, { name: "Mês 2", value: 1050 },
+                { name: "Mês 3", value: 1600 }, { name: "Mês 4", value: 2200 },
+                { name: "Mês 5", value: 2800 }, { name: "Mês 6", value: 3076 }
               ]
           }]
         };
@@ -86,8 +90,8 @@ const Dashboard = () => {
       }, 1500);
       return; 
     }
-    // ---------------------------------------
 
+    // --- CHAMADA REAL API ---
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), getFetchTimeout());
@@ -104,7 +108,7 @@ const Dashboard = () => {
 
       const raw = await res.json();
       
-      // Tratamento de métricas (igual ao anterior)
+      // Tratamento para garantir que métricas existam
       let metricsData = raw.metrics || [];
       if (raw.variaveis_matematicas && metricsData.length === 0) {
         metricsData = [
@@ -151,8 +155,10 @@ const Dashboard = () => {
   };
 
   return (
+    // ESTRUTURA FLEX COLUMN PARA OCUPAR TELA TODA
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* Sidebar */}
+      
+      {/* Sidebar na Esquerda */}
       <HistorySidebar
         history={history}
         selectedId={selectedConversationId}
@@ -160,60 +166,61 @@ const Dashboard = () => {
         onDeleteConversation={handleDeleteConversation}
       />
       
-      {/* Área Principal (Chat) */}
-      <div className="flex-1 flex flex-col relative min-w-0 bg-gradient-to-b from-background to-background/50">
+      {/* Área Principal do Chat */}
+      <div className="flex-1 flex flex-col relative h-full w-full">
         
-        {/* Header Fixo no Topo */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-background/80 backdrop-blur-md z-10 shrink-0">
+        {/* 1. TOPO: Header Fixo */}
+        <header className="flex items-center justify-between px-6 py-4 border-b border-border/20 bg-background/80 backdrop-blur-md z-20 shrink-0">
             <div className="flex items-center gap-2">
                 <MoneyPlanLogo size="sm" />
-                <h1 className="text-lg font-bold tracking-tight">MoneyPlan<span className="text-primary">$</span></h1>
+                <h1 className="text-lg font-bold">MoneyPlan<span className="text-primary">$</span></h1>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20">
-                <span className="text-sm">🔥</span>
-                <span className="text-xs font-bold text-orange-500">5 Dias</span>
+            <div className="px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-xs font-bold text-orange-500 flex items-center gap-1">
+                🔥 5 Dias
             </div>
         </header>
 
-        {/* LISTA DE MENSAGENS (Scroll) */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin scroll-smooth">
+        {/* 2. MEIO: Área de Mensagens (Scrollável) */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
             <div className="max-w-3xl mx-auto space-y-6 pb-4">
                 
-                {/* Tela de Boas Vindas (Só aparece se não tiver mensagens) */}
+                {/* Boas vindas (Só aparece se não tiver mensagens) */}
                 {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4 animate-fade-in opacity-50">
-                        <div className="p-4 rounded-full bg-muted/30">
+                    <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4 animate-in fade-in zoom-in duration-500">
+                        <div className="p-4 rounded-full bg-primary/10 mb-2">
                             <Sparkles className="w-8 h-8 text-primary" />
                         </div>
-                        <h2 className="text-2xl font-bold">Olá! Como posso ajudar?</h2>
-                        <p className="text-sm text-muted-foreground">Pergunte sobre seus gastos, investimentos ou metas.</p>
+                        <h2 className="text-2xl font-bold">Olá! Vamos organizar suas finanças?</h2>
+                        <p className="text-muted-foreground max-w-sm">
+                            Digite abaixo sobre seus gastos, investimentos ou peça uma simulação.
+                        </p>
                     </div>
                 )}
 
                 {/* Renderização das Mensagens */}
                 {messages.map((msg, idx) => (
-                    <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
+                    <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2`}>
                         
                         {/* Avatar do Robô */}
                         {msg.role === 'assistant' && (
-                            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-1">
+                            <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center shrink-0 mt-1">
                                 <Bot className="w-4 h-4 text-primary" />
                             </div>
                         )}
 
-                        {/* Conteúdo do Balão */}
-                        <div className={`flex flex-col max-w-[85%] space-y-4`}>
+                        {/* Conteúdo (Texto + Gráficos) */}
+                        <div className={`flex flex-col max-w-[85%] md:max-w-[75%] space-y-3`}>
                             {msg.content && (
-                                <div className={`p-4 rounded-2xl text-sm md:text-base ${
+                                <div className={`px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${
                                     msg.role === 'user' 
                                     ? 'bg-primary text-primary-foreground rounded-tr-sm' 
-                                    : 'bg-muted/30 border border-border/50 text-foreground rounded-tl-sm'
+                                    : 'bg-card border border-border/50 text-foreground rounded-tl-sm'
                                 }`}>
-                                    <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                    <p className="whitespace-pre-wrap">{msg.content}</p>
                                 </div>
                             )}
 
-                            {/* Se for robô e tiver gráficos/métricas, mostra aqui dentro */}
+                            {/* Se for robô, mostra gráficos DENTRO da mensagem */}
                             {msg.role === 'assistant' && (
                                 <>
                                     {msg.metrics && msg.metrics.length > 0 && <MetricsGrid metrics={msg.metrics} />}
@@ -231,31 +238,31 @@ const Dashboard = () => {
                     </div>
                 ))}
 
-                {/* Loading (Três pontinhos) */}
+                {/* Loading State */}
                 {isLoading && (
-                    <div className="flex gap-4">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                             <Bot className="w-4 h-4 text-primary" />
+                    <div className="flex gap-3">
+                         <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                <Bot className="w-4 h-4 text-primary" />
                         </div>
-                        <div className="bg-muted/30 px-4 py-3 rounded-2xl rounded-tl-sm flex items-center gap-1">
-                            <span className="w-2 h-2 bg-primary/50 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                            <span className="w-2 h-2 bg-primary/50 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                            <span className="w-2 h-2 bg-primary/50 rounded-full animate-bounce"></span>
+                        <div className="bg-card px-4 py-3 rounded-2xl rounded-tl-sm border border-border/50 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                            <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                            <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce"></span>
                         </div>
                     </div>
                 )}
                 
-                {/* Div invisível para scroll automático */}
-                <div ref={scrollRef} />
+                {/* Elemento invisível para auto-scroll */}
+                <div ref={scrollRef} className="h-1" />
             </div>
         </div>
 
-        {/* INPUT FIXO EMBAIXO */}
-        <div className="p-4 bg-background/95 backdrop-blur-xl border-t border-border/40 z-20">
+        {/* 3. RODAPÉ: Input Fixo */}
+        <div className="p-4 bg-background/95 backdrop-blur-xl border-t border-border/30 z-20">
             <div className="max-w-3xl mx-auto">
                 <QueryInput onSubmit={handleQuery} isLoading={isLoading} />
                 <p className="text-center text-[10px] text-muted-foreground mt-2 opacity-50">
-                    MoneyPlan AI pode cometer erros. Verifique informações importantes.
+                    MoneyPlan$ AI • Finanças Inteligentes
                 </p>
             </div>
         </div>
