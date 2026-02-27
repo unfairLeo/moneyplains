@@ -22,7 +22,6 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]); 
   
-  // O Painel começa oculto (false)
   const [showDashboard, setShowDashboard] = useState(false); 
 
   const [currentNetWorth, setCurrentNetWorth] = useState<number>(0);
@@ -41,19 +40,29 @@ const Dashboard = () => {
     }
   }, [messages, isLoading]);
 
+  // --- FUNÇÃO PARA LIMPAR VALORES MONETÁRIOS ---
+  // Transforma "R$ 15.000,00" ou "15000" em 15000.00 (Número puro)
+  const parseMoney = (val: any) => {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+        // Remove tudo que não é número ou vírgula/ponto
+        const cleanStr = val.replace(/[^\d.,-]/g, '');
+        // Troca vírgula por ponto se for formato BR
+        const dotStr = cleanStr.replace(',', '.');
+        return parseFloat(dotStr) || 0;
+    }
+    return 0;
+  };
+
   const handleQuery = async (query: string) => {
     const userMessage: ChatMessage = { role: 'user', content: query };
     setMessages(prev => [...prev, userMessage]);
 
     const lowerQuery = query.toLowerCase();
 
-    // --- COMANDOS DE ATIVAÇÃO (PALAVRAS-CHAVE) ---
-    const activationKeywords = [
-        "ativar", "painel", "dashboard", "mostrar", "ver", "ligar", "patrimonio", "grafico"
-    ];
-    
-    // Se a frase contiver (ex: "ativar painel", "ver dashboard"), liga a tela
-    // Mas evitamos palavras soltas comuns se não fizerem sentido (ex: "ver" sozinho)
+    // COMANDOS DE ATIVAÇÃO
+    const activationKeywords = ["ativar", "painel", "dashboard", "mostrar", "ver", "ligar", "patrimonio", "grafico"];
     const isActivationCommand = activationKeywords.some(word => lowerQuery.includes(word));
     
     if (isActivationCommand && (lowerQuery.includes("painel") || lowerQuery.includes("dashboard") || lowerQuery.includes("grafico") || lowerQuery.includes("patrimonio"))) {
@@ -63,14 +72,10 @@ const Dashboard = () => {
         }
     }
 
-    // --- COMANDO DE DESATIVAÇÃO ---
     if (lowerQuery.includes("ocultar") || lowerQuery.includes("fechar") || lowerQuery.includes("esconder") || lowerQuery.includes("desativar")) {
         setShowDashboard(false);
         toast({ title: "Modo Foco", description: "Painel ocultado.", duration: 2000 });
-        // Se for só um comando de fechar, paramos por aqui para não chamar a IA
-        if (lowerQuery.split(' ').length < 3) {
-            return; 
-        }
+        if (lowerQuery.split(' ').length < 3) return; 
     }
 
     const validation = validateQuery(query);
@@ -103,16 +108,35 @@ const Dashboard = () => {
 
       const raw = await res.json();
       
-      // --- TRADUTOR DO N8N ---
-      if (raw.net_worth !== undefined) {
-          setCurrentNetWorth(Number(raw.net_worth));
+      // --- LÓGICA BLINDADA PARA ATUALIZAR O PATRIMÔNIO ---
+      
+      let newNetWorth = 0;
+
+      // 1. Tenta pegar direto do campo 'net_worth'
+      if (raw.net_worth) {
+          newNetWorth = parseMoney(raw.net_worth);
       }
 
+      // 2. Se falhar, tenta pegar do último valor do gráfico (Isso garante que bate com o chat!)
+      if (raw.valores && Array.isArray(raw.valores) && raw.valores.length > 0) {
+          const lastValue = raw.valores[raw.valores.length - 1];
+          // Só substitui se o net_worth estava zerado ou se queremos priorizar o gráfico
+          if (newNetWorth === 0) {
+             newNetWorth = parseMoney(lastValue);
+          }
+      }
+
+      // Atualiza o estado se achou algum valor válido
+      if (newNetWorth > 0) {
+          setCurrentNetWorth(newNetWorth);
+      }
+
+      // --- GERAÇÃO DOS GRÁFICOS ---
       let generatedCharts = [];
       if (raw.labels && raw.valores && raw.labels.length > 0) {
           const chartData = raw.labels.map((label: string, index: number) => ({
               name: label,
-              value: raw.valores[index]
+              value: parseMoney(raw.valores[index]) // Garante que é número
           }));
           
           generatedCharts.push({
@@ -148,7 +172,7 @@ const Dashboard = () => {
           conversation: raw.resposta || raw.conversation, 
           charts: generatedCharts, 
           metrics: generatedMetrics,
-          net_worth: raw.net_worth 
+          net_worth: newNetWorth // Salva o valor corrigido
       });
 
     } catch (err) {
@@ -189,7 +213,6 @@ const Dashboard = () => {
       />
       
       <div className="flex-1 flex flex-col relative h-full w-full">
-        {/* HEADER LIMPO (Sem botões extras) */}
         <header className="flex items-center justify-between px-6 py-4 border-b border-border/20 bg-background/80 backdrop-blur-md z-20 shrink-0">
             <div className="flex items-center gap-2">
                 <MoneyPlanLogo size="sm" />
@@ -206,7 +229,6 @@ const Dashboard = () => {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
             <div className="max-w-3xl mx-auto space-y-6 pb-4">
                 
-                {/* WIDGET CONDICIONAL (Só aparece com a palavra mágica) */}
                 {showDashboard && (
                     <div className="mb-8 animate-in slide-in-from-top-10 fade-in duration-700 ease-out">
                         <WealthWidget 
