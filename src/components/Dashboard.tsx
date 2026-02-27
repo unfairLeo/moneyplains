@@ -107,7 +107,6 @@ const Dashboard = () => {
       if (!res.ok) throw new Error(`Erro na API: ${res.status}`);
 
       const raw = await res.json();
-      
       // Tratamento para garantir que métricas existam
       let metricsData = raw.metrics || [];
       if (raw.variaveis_matematicas && metricsData.length === 0) {
@@ -117,6 +116,12 @@ const Dashboard = () => {
         ];
       }
 
+      const aiMessage: ChatMessage = {
+        role: 'assistant',
+        content: raw.conversation || "Dados processados.",
+        charts: raw.charts,
+        metrics: metricsData
+      };
       const aiMessage: ChatMessage = {
         role: 'assistant',
         content: raw.conversation || "Dados processados.",
