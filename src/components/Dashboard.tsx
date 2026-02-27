@@ -31,13 +31,43 @@ const Dashboard = () => {
   const { toast } = useToast();
   const { history, saveConversation, deleteConversation } = useConversationHistory();
 
+  // --- O SEGREDO: O EFEITO "ESPELHO" ---
+  // Toda vez que as mensagens mudam, ele verifica se tem gráfico novo
+  // e força a atualização do topo. É infalível.
+  useEffect(() => {
+    if (messages.length > 0) {
+        const lastMsg = messages[messages.length - 1];
+        
+        // Se a última mensagem for do robô e tiver gráficos
+        if (lastMsg.role === 'assistant' && lastMsg.charts && lastMsg.charts.length > 0) {
+            const chart = lastMsg.charts[0];
+            
+            // Pega os dados do gráfico
+            if (chart.data && chart.data.length > 0) {
+                // 1. Atualiza o Gráfico do Topo
+                setCurrentChartData(chart.data);
+
+                // 2. Pega o ÚLTIMO valor do gráfico (o saldo final)
+                const lastValue = chart.data[chart.data.length - 1].value;
+                
+                // 3. Força o Card a mostrar esse valor
+                setCurrentNetWorth(Number(lastValue));
+                
+                // 4. Garante que o painel esteja visível
+                if (!showDashboard) setShowDashboard(true);
+            }
+        }
+    }
+  }, [messages]); // Roda sempre que 'messages' muda
+
+  // Scroll automático
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isLoading]);
 
-  // Função auxiliar para limpar dinheiro (texto -> numero)
+  // Função auxiliar de limpeza
   const parseMoney = (val: any) => {
     if (!val) return 0;
     if (typeof val === 'number') return val;
@@ -53,16 +83,12 @@ const Dashboard = () => {
     const userMessage: ChatMessage = { role: 'user', content: query };
     setMessages(prev => [...prev, userMessage]);
 
-    // Lógica de Ativação do Painel por Texto
+    // Comandos manuais de ativação
     const lowerQuery = query.toLowerCase();
-    const activationKeywords = ["ativar", "painel", "dashboard", "mostrar", "ver", "ligar", "patrimonio", "grafico"];
-    if (activationKeywords.some(w => lowerQuery.includes(w)) && (lowerQuery.includes("painel") || lowerQuery.includes("dashboard") || lowerQuery.includes("grafico"))) {
-        if (!showDashboard) setShowDashboard(true);
+    if (lowerQuery.includes("ativar") || lowerQuery.includes("mostrar") || lowerQuery.includes("ver")) {
+        if (lowerQuery.includes("painel") || lowerQuery.includes("grafico")) setShowDashboard(true);
     }
-    if (lowerQuery.includes("ocultar") || lowerQuery.includes("fechar")) {
-        setShowDashboard(false);
-        if (lowerQuery.split(' ').length < 3) return; 
-    }
+    if (lowerQuery.includes("ocultar") || lowerQuery.includes("fechar")) setShowDashboard(false);
 
     const validation = validateQuery(query);
     if (!validation.success) {
@@ -94,13 +120,10 @@ const Dashboard = () => {
 
       const raw = await res.json();
       
-      // --- LÓGICA DE CORREÇÃO DE DADOS ---
-      
-      let finalNetWorth = parseMoney(raw.net_worth);
-      let generatedCharts = [];
-      let generatedMetrics = [];
+      // --- PROCESSAMENTO SIMPLIFICADO ---
+      // (O trabalho pesado agora é feito pelo useEffect lá em cima)
 
-      // 1. Processa o Gráfico
+      let generatedCharts = [];
       if (raw.labels && raw.valores && raw.labels.length > 0) {
           const chartData = raw.labels.map((label: string, index: number) => ({
               name: label,
@@ -111,22 +134,11 @@ const Dashboard = () => {
               title: raw.titulo || "Análise Financeira",
               data: chartData
           });
-          setCurrentChartData(chartData);
-
-          // TRUQUE: Se o net_worth veio zerado mas temos gráfico, usa o último valor do gráfico
-          if (finalNetWorth === 0 && chartData.length > 0) {
-             finalNetWorth = chartData[chartData.length - 1].value;
-          }
       } else if (raw.charts) {
           generatedCharts = raw.charts;
       }
 
-      // 2. Atualiza o Card do Topo com o valor corrigido
-      if (finalNetWorth > 0) {
-          setCurrentNetWorth(finalNetWorth);
-      }
-
-      // 3. Processa Métricas
+      let generatedMetrics = [];
       const vars = raw.variaveis_matematicas || {};
       if (vars.renda_mensal) generatedMetrics.push({ label: "Renda", value: `R$ ${vars.renda_mensal}`, change: "Entrada", trend: "up" });
       if (vars.gasto_mensal) generatedMetrics.push({ label: "Gasto", value: `R$ ${vars.gasto_mensal}`, change: "Saída", trend: "down" });
@@ -143,11 +155,13 @@ const Dashboard = () => {
       
       setMessages(prev => [...prev, aiMessage]);
       
+      // Salva no histórico com o valor corrigido se possível
+      const finalWorth = raw.net_worth ? parseMoney(raw.net_worth) : 0;
       saveConversation(query, { 
           conversation: raw.resposta || raw.conversation, 
           charts: generatedCharts, 
           metrics: generatedMetrics,
-          net_worth: finalNetWorth 
+          net_worth: finalWorth
       });
 
     } catch (err) {
@@ -220,7 +234,7 @@ const Dashboard = () => {
                         </div>
                         <h2 className="text-xl font-bold">MoneyPlan AI</h2>
                         <p className="text-sm text-muted-foreground">
-                            Digite <span className="font-bold text-primary">"Ativar Painel"</span> para ver seus dados.
+                            Digite <span className="font-bold text-primary">"Ativar Painel"</span> e peça uma simulação.
                         </p>
                     </div>
                 )}
@@ -256,16 +270,17 @@ const Dashboard = () => {
                         )}
                     </div>
                 ))}
+                
                 {isLoading && (
                     <div className="flex gap-3">
                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
                                 <Bot className="w-4 h-4 text-primary" />
                         </div>
-                        <div className="bg-card px-4 py-3 rounded-2xl rounded-tl-sm border border-border/50 flex items-center gap-1">
+                         <div className="bg-card px-4 py-3 rounded-2xl rounded-tl-sm border border-border/50 flex items-center gap-1">
                              <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                              <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                              <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce"></span>
-                        </div>
+                         </div>
                     </div>
                 )}
                 <div ref={scrollRef} className="h-1" />
