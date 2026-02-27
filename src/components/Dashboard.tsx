@@ -107,19 +107,38 @@ const Dashboard = () => {
       if (!res.ok) throw new Error(`Erro na API: ${res.status}`);
 
       const raw = await res.json();
-      // Tratamento para garantir que métricas existam
-      let metricsData = raw.metrics || [];
-      if (raw.variaveis_matematicas && metricsData.length === 0) {
-        metricsData = [
-          { label: "Renda", value: `R$ ${raw.variaveis_matematicas.renda_mensal}`, change: "Entrada", trend: "up" },
-          { label: "Meta", value: `R$ ${raw.variaveis_matematicas.meta_total}`, change: "Alvo", trend: "neutral" }
-        ];
+  // --- CORREÇÃO PARA LER OS DADOS DO SEU N8N ---
+
+      // 1. Traduz 'labels' e 'valores' para o Gráfico
+      let chartsData = raw.charts || [];
+      if (raw.labels && raw.valores && raw.labels.length > 0) {
+          const chartPoints = raw.labels.map((label: string, index: number) => ({
+              name: label,
+              value: raw.valores[index]
+          }));
+          
+          chartsData = [{
+              title: raw.titulo || "Análise Financeira",
+              data: chartPoints
+          }];
       }
 
+      // 2. Traduz 'variaveis_matematicas' para os Cards
+      let metricsData = raw.metrics || [];
+      if (raw.variaveis_matematicas) {
+          metricsData = []; // Reinicia para preencher certo
+          const v = raw.variaveis_matematicas;
+          if (v.renda_mensal) metricsData.push({ label: "Renda", value: `R$ ${v.renda_mensal}`, change: "Entrada", trend: "up" });
+          if (v.gasto_mensal) metricsData.push({ label: "Gasto", value: `R$ ${v.gasto_mensal}`, change: "Saída", trend: "down" });
+          if (v.sobra_mensal) metricsData.push({ label: "Sobra", value: `R$ ${v.sobra_mensal}`, change: "Saldo", trend: "neutral" });
+          if (v.meta_total) metricsData.push({ label: "Meta", value: `R$ ${v.meta_total}`, change: "Alvo", trend: "up" });
+      }
+
+      // 3. Cria a mensagem lendo 'resposta' (que é o que o seu prompt manda)
       const aiMessage: ChatMessage = {
         role: 'assistant',
-        content: raw.conversation || "Dados processados.",
-        charts: raw.charts,
+        content: raw.resposta || raw.conversation || "Dados processados.",
+        charts: chartsData,
         metrics: metricsData
       };
       const aiMessage: ChatMessage = {
