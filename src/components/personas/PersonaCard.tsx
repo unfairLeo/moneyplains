@@ -18,13 +18,16 @@ export function PersonaCard({ persona }: PersonaCardProps) {
   const config = colorConfig[persona.color];
   const Icon = iconMap[persona.iconName];
 
-  if (persona.isLocked) {
+if (persona.isLocked) {
     return (
-      <div className="glass-card p-6 opacity-60 relative overflow-hidden cursor-not-allowed">
+      // 1. Aumentamos a opacidade de 60 para 80 ou 90 para o card não sumir no fundo
+      <div className="glass-card p-6 opacity-90 relative overflow-hidden cursor-not-allowed border-muted/20">
+        
         {/* Locked Overlay */}
-        <div className="absolute inset-0 bg-background/30 backdrop-blur-[1px] z-10 flex items-center justify-center">
-          <div className="p-4 rounded-full bg-muted/80">
-            <Lock className="w-8 h-8 text-muted-foreground" />
+        {/* 2. Removemos o 'backdrop-blur' e usamos um fundo preto bem transparente 'bg-black/20' */}
+        <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center">
+          <div className="p-4 rounded-full bg-background/80 shadow-xl border border-white/5">
+            <Lock className="w-8 h-8 text-muted-foreground/50" />
           </div>
         </div>
 
