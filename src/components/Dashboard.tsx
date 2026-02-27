@@ -21,12 +21,9 @@ type ChatMessage = {
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]); 
-  
   const [showDashboard, setShowDashboard] = useState(false); 
-
   const [currentNetWorth, setCurrentNetWorth] = useState<number>(0);
   const [currentChartData, setCurrentChartData] = useState<any[]>([]);
-
   const [error, setError] = useState<string | null>(null);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   
@@ -40,15 +37,12 @@ const Dashboard = () => {
     }
   }, [messages, isLoading]);
 
-  // --- FUNÇÃO PARA LIMPAR VALORES MONETÁRIOS ---
-  // Transforma "R$ 15.000,00" ou "15000" em 15000.00 (Número puro)
+  // Função auxiliar para limpar dinheiro (texto -> numero)
   const parseMoney = (val: any) => {
     if (!val) return 0;
     if (typeof val === 'number') return val;
     if (typeof val === 'string') {
-        // Remove tudo que não é número ou vírgula/ponto
         const cleanStr = val.replace(/[^\d.,-]/g, '');
-        // Troca vírgula por ponto se for formato BR
         const dotStr = cleanStr.replace(',', '.');
         return parseFloat(dotStr) || 0;
     }
@@ -59,22 +53,14 @@ const Dashboard = () => {
     const userMessage: ChatMessage = { role: 'user', content: query };
     setMessages(prev => [...prev, userMessage]);
 
+    // Lógica de Ativação do Painel por Texto
     const lowerQuery = query.toLowerCase();
-
-    // COMANDOS DE ATIVAÇÃO
     const activationKeywords = ["ativar", "painel", "dashboard", "mostrar", "ver", "ligar", "patrimonio", "grafico"];
-    const isActivationCommand = activationKeywords.some(word => lowerQuery.includes(word));
-    
-    if (isActivationCommand && (lowerQuery.includes("painel") || lowerQuery.includes("dashboard") || lowerQuery.includes("grafico") || lowerQuery.includes("patrimonio"))) {
-        if (!showDashboard) {
-            setShowDashboard(true);
-            toast({ title: "Modo Dashboard", description: "Painel visual ativado.", duration: 2000 });
-        }
+    if (activationKeywords.some(w => lowerQuery.includes(w)) && (lowerQuery.includes("painel") || lowerQuery.includes("dashboard") || lowerQuery.includes("grafico"))) {
+        if (!showDashboard) setShowDashboard(true);
     }
-
-    if (lowerQuery.includes("ocultar") || lowerQuery.includes("fechar") || lowerQuery.includes("esconder") || lowerQuery.includes("desativar")) {
+    if (lowerQuery.includes("ocultar") || lowerQuery.includes("fechar")) {
         setShowDashboard(false);
-        toast({ title: "Modo Foco", description: "Painel ocultado.", duration: 2000 });
         if (lowerQuery.split(' ').length < 3) return; 
     }
 
@@ -108,35 +94,17 @@ const Dashboard = () => {
 
       const raw = await res.json();
       
-      // --- LÓGICA BLINDADA PARA ATUALIZAR O PATRIMÔNIO ---
+      // --- LÓGICA DE CORREÇÃO DE DADOS ---
       
-      let newNetWorth = 0;
-
-      // 1. Tenta pegar direto do campo 'net_worth'
-      if (raw.net_worth) {
-          newNetWorth = parseMoney(raw.net_worth);
-      }
-
-      // 2. Se falhar, tenta pegar do último valor do gráfico (Isso garante que bate com o chat!)
-      if (raw.valores && Array.isArray(raw.valores) && raw.valores.length > 0) {
-          const lastValue = raw.valores[raw.valores.length - 1];
-          // Só substitui se o net_worth estava zerado ou se queremos priorizar o gráfico
-          if (newNetWorth === 0) {
-             newNetWorth = parseMoney(lastValue);
-          }
-      }
-
-      // Atualiza o estado se achou algum valor válido
-      if (newNetWorth > 0) {
-          setCurrentNetWorth(newNetWorth);
-      }
-
-      // --- GERAÇÃO DOS GRÁFICOS ---
+      let finalNetWorth = parseMoney(raw.net_worth);
       let generatedCharts = [];
+      let generatedMetrics = [];
+
+      // 1. Processa o Gráfico
       if (raw.labels && raw.valores && raw.labels.length > 0) {
           const chartData = raw.labels.map((label: string, index: number) => ({
               name: label,
-              value: parseMoney(raw.valores[index]) // Garante que é número
+              value: parseMoney(raw.valores[index])
           }));
           
           generatedCharts.push({
@@ -144,20 +112,27 @@ const Dashboard = () => {
               data: chartData
           });
           setCurrentChartData(chartData);
+
+          // TRUQUE: Se o net_worth veio zerado mas temos gráfico, usa o último valor do gráfico
+          if (finalNetWorth === 0 && chartData.length > 0) {
+             finalNetWorth = chartData[chartData.length - 1].value;
+          }
       } else if (raw.charts) {
           generatedCharts = raw.charts;
       }
 
-      let generatedMetrics = [];
+      // 2. Atualiza o Card do Topo com o valor corrigido
+      if (finalNetWorth > 0) {
+          setCurrentNetWorth(finalNetWorth);
+      }
+
+      // 3. Processa Métricas
       const vars = raw.variaveis_matematicas || {};
       if (vars.renda_mensal) generatedMetrics.push({ label: "Renda", value: `R$ ${vars.renda_mensal}`, change: "Entrada", trend: "up" });
       if (vars.gasto_mensal) generatedMetrics.push({ label: "Gasto", value: `R$ ${vars.gasto_mensal}`, change: "Saída", trend: "down" });
       if (vars.sobra_mensal) generatedMetrics.push({ label: "Sobra", value: `R$ ${vars.sobra_mensal}`, change: "Saldo", trend: "neutral" });
-      if (vars.meta_total) generatedMetrics.push({ label: "Meta", value: `R$ ${vars.meta_total}`, change: "Alvo", trend: "up" });
-
-      if (generatedMetrics.length === 0 && raw.metrics) {
-          generatedMetrics = raw.metrics;
-      }
+      
+      if (generatedMetrics.length === 0 && raw.metrics) generatedMetrics = raw.metrics;
 
       const aiMessage: ChatMessage = {
         role: 'assistant',
@@ -172,7 +147,7 @@ const Dashboard = () => {
           conversation: raw.resposta || raw.conversation, 
           charts: generatedCharts, 
           metrics: generatedMetrics,
-          net_worth: newNetWorth // Salva o valor corrigido
+          net_worth: finalNetWorth 
       });
 
     } catch (err) {
@@ -218,7 +193,6 @@ const Dashboard = () => {
                 <MoneyPlanLogo size="sm" />
                 <h1 className="text-lg font-bold">MoneyPlan<span className="text-primary">$</span></h1>
             </div>
-            
             <div className="flex items-center gap-3">
                 <div className="hidden md:flex px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-xs font-bold text-orange-500 items-center gap-1">
                     🔥 5 Dias
@@ -258,7 +232,6 @@ const Dashboard = () => {
                                 <Bot className="w-4 h-4 text-primary" />
                             </div>
                         )}
-
                         <div className={`flex flex-col max-w-[85%] md:max-w-[75%] space-y-3`}>
                             {msg.content && (
                                 <div className={`px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${
@@ -276,7 +249,6 @@ const Dashboard = () => {
                                 </>
                             )}
                         </div>
-
                         {msg.role === 'user' && (
                             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1">
                                 <User className="w-4 h-4 text-muted-foreground" />
@@ -284,20 +256,18 @@ const Dashboard = () => {
                         )}
                     </div>
                 ))}
-
                 {isLoading && (
                     <div className="flex gap-3">
                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
                                 <Bot className="w-4 h-4 text-primary" />
                         </div>
                         <div className="bg-card px-4 py-3 rounded-2xl rounded-tl-sm border border-border/50 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                            <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                            <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce"></span>
+                             <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                             <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                             <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce"></span>
                         </div>
                     </div>
                 )}
-                
                 <div ref={scrollRef} className="h-1" />
             </div>
         </div>
