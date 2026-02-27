@@ -159,7 +159,7 @@ const Dashboard = () => {
         {/* Header */}
         <header className="text-center mb-12">
           <div className="inline-flex items-center gap-3 mb-4">
-            <MoneyPlanLogo size="lg" />
+            <img src="/logo-renew.png" alt="Logo" className="w-16 h-16 object-contain" />
             <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
               <span className="text-primary text-glow-emerald">Money</span>
               <span className="text-foreground">Plan</span>
