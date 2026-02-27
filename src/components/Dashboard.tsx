@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { User, Bot, Sparkles, Wallet, TrendingUp, TrendingDown } from "lucide-react"; 
+import { User, Bot, Sparkles, Wallet, TrendingUp, Plus, ArrowRight } from "lucide-react"; 
+import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"; // Importando o gráfico
 import QueryInput from "./QueryInput";
-import ChartDisplay from "./ChartDisplay";
 import MetricsGrid from "./MetricsGrid";
 import HistorySidebar from "./HistorySidebar";
 import { useToast } from "@/hooks/use-toast";
@@ -21,10 +21,9 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]); 
   
-  // Estados dos Cards do Topo
+  // ESTADO DO COFRE
   const [saldo, setSaldo] = useState<number>(0);
-  const [entradas, setEntradas] = useState<number>(0);
-  const [saidas, setSaidas] = useState<number>(0);
+  const [chartData, setChartData] = useState<any[]>([]); // Dados da curva
 
   const [error, setError] = useState<string | null>(null);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -37,21 +36,21 @@ const Dashboard = () => {
     if (scrollRef.current) scrollRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Efeito "Espelho" para manter sincronia visual com mensagens antigas
+  // Efeito Espelho + Geração de Curva Decorativa (Se não tiver dados reais)
   useEffect(() => {
-    if (messages.length > 0) {
-        const lastMsg = messages[messages.length - 1];
-        if (lastMsg.role === 'assistant' && lastMsg.metrics) {
-            lastMsg.metrics.forEach((m: any) => {
-                const val = parseFloat(String(m.value).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
-                if (m.label.includes("Renda") || m.label.includes("Entrada")) setEntradas(val);
-                if (m.label.includes("Gasto") || m.label.includes("Saída")) setSaidas(val);
-                // Se a métrica for de saldo, atualiza também
-                if (m.label.includes("Sobra") || m.label.includes("Saldo") || m.label.includes("Meta")) setSaldo(val);
-            });
-        }
+    if (chartData.length === 0) {
+        // Gera uma curva "fake" bonita só para não ficar vazio no início
+        const fakeCurve = [
+            { name: 'Start', value: saldo * 0.8 },
+            { name: 'P1', value: saldo * 0.85 },
+            { name: 'P2', value: saldo * 0.82 },
+            { name: 'P3', value: saldo * 0.9 },
+            { name: 'P4', value: saldo * 0.95 },
+            { name: 'Now', value: saldo || 100 } 
+        ];
+        setChartData(fakeCurve);
     }
-  }, [messages]);
+  }, [saldo]);
 
   const handleQuery = async (query: string) => {
     const userMessage: ChatMessage = { role: 'user', content: query };
@@ -84,31 +83,30 @@ const Dashboard = () => {
 
       const raw = await res.json();
       
-      // Processamento básico de Gráficos
+      // --- CAPTURA INTELIGENTE DE DADOS ---
+      
+      // 1. Atualiza o Saldo (Bala de Prata)
+      if (raw.net_worth !== undefined) {
+          const cleanVal = parseFloat(String(raw.net_worth).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
+          setSaldo(cleanVal);
+      }
+
+      // 2. Atualiza a Curva do Cofre (Se vier gráfico da IA)
       let generatedCharts = raw.charts || [];
       if (raw.labels && raw.valores) {
+           const newData = raw.labels.map((l:string, i:number) => ({ name: l, value: raw.valores[i] }));
+           setChartData(newData); // Atualiza a curva do topo
+           
            generatedCharts = [{
               title: raw.titulo || "Análise",
-              data: raw.labels.map((l:string, i:number) => ({ name: l, value: raw.valores[i] }))
+              data: newData
            }];
       }
 
-      // Processamento de Métricas e Variáveis
       let generatedMetrics = raw.metrics || [];
       const v = raw.variaveis_matematicas || {};
-
-      // --- CORREÇÃO DO BASE44 APLICADA AQUI ---
-      // Atualiza patrimônio diretamente se a IA retornar net_worth
-      if (raw.net_worth !== undefined) {
-          // Limpa o valor (tira R$, pontos, etc) e seta o estado
-          const cleanNetWorth = parseFloat(String(raw.net_worth).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
-          setSaldo(cleanNetWorth);
-      }
-      // ----------------------------------------
-
-      if (v.renda_mensal) generatedMetrics.push({ label: "Renda Mensal", value: `R$ ${v.renda_mensal}`, change: "Entrada", trend: "up" });
-      if (v.gasto_mensal) generatedMetrics.push({ label: "Gasto Mensal", value: `R$ ${v.gasto_mensal}`, change: "Saída", trend: "down" });
-      if (v.sobra_mensal) generatedMetrics.push({ label: "Sobra/Saldo", value: `R$ ${v.sobra_mensal}`, change: "Acumulado", trend: "neutral" });
+      if (v.renda_mensal) generatedMetrics.push({ label: "Renda", value: `R$ ${v.renda_mensal}`, change: "Entrada", trend: "up" });
+      if (v.gasto_mensal) generatedMetrics.push({ label: "Gasto", value: `R$ ${v.gasto_mensal}`, change: "Saída", trend: "down" });
 
       const aiMessage: ChatMessage = {
         role: 'assistant',
@@ -142,7 +140,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-background overflow-hidden font-sans">
       <HistorySidebar
         history={history}
         selectedId={selectedConversationId}
@@ -164,56 +162,68 @@ const Dashboard = () => {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
             <div className="max-w-3xl mx-auto space-y-6 pb-4">
                 
-                {/* --- PAINEL EXECUTIVO (3 CARDS) --- */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    {/* Card 1: Patrimônio (Atualizado pelo net_worth) */}
-                    <div className="p-4 rounded-2xl bg-card border border-border/50 shadow-sm flex items-center gap-4">
-                        <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                            <Wallet className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Patrimônio</p>
-                            <h3 className="text-xl font-bold">
-                                {saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            </h3>
-                        </div>
-                    </div>
+                {/* --- COFRE INTELIGENTE (Visual Premium) --- */}
+                <div className="relative w-full h-[320px] rounded-3xl bg-black border border-white/5 shadow-2xl overflow-hidden group">
+                    
+                    {/* Fundo com efeito de luz (Glow) */}
+                    <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
 
-                    {/* Card 2: Entradas */}
-                    <div className="p-4 rounded-2xl bg-card border border-border/50 shadow-sm flex items-center gap-4">
-                        <div className="p-3 rounded-xl bg-green-500/10 text-green-500">
-                            <TrendingUp className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Entradas</p>
-                            <h3 className="text-xl font-bold text-green-500">
-                                {entradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            </h3>
-                        </div>
-                    </div>
+                    <div className="relative z-10 flex flex-col h-full p-8 justify-between">
+                        {/* Cabeçalho do Card */}
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="p-1.5 rounded-full bg-white/10">
+                                        <Sparkles className="w-4 h-4 text-green-400" />
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-400 tracking-wide">COFRE INTELIGENTE</span>
+                                </div>
+                                <h2 className="text-5xl font-bold text-white tracking-tighter drop-shadow-lg">
+                                    {saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                </h2>
+                                <div className="flex items-center gap-2 mt-2 text-green-400 text-sm font-medium bg-green-400/10 w-fit px-2 py-1 rounded-lg">
+                                    <TrendingUp className="w-3 h-3" />
+                                    <span>+12.5% rendimento</span>
+                                </div>
+                            </div>
 
-                    {/* Card 3: Saídas */}
-                    <div className="p-4 rounded-2xl bg-card border border-border/50 shadow-sm flex items-center gap-4">
-                         <div className="p-3 rounded-xl bg-red-500/10 text-red-500">
-                            <TrendingDown className="w-6 h-6" />
+                            {/* Botão de Ação */}
+                            <button className="flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary/90 text-black font-bold rounded-full transition-all shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)]">
+                                <Plus className="w-4 h-4" />
+                                <span>Aportar</span>
+                            </button>
                         </div>
-                        <div>
-                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Saídas</p>
-                            <h3 className="text-xl font-bold text-red-500">
-                                {saidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            </h3>
+
+                        {/* Área do Gráfico (Fica no fundo da parte inferior) */}
+                        <div className="absolute bottom-0 left-0 right-0 h-[160px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData}>
+                                    <defs>
+                                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <Tooltip content={() => null} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }} />
+                                    <Area 
+                                        type="monotone" 
+                                        dataKey="value" 
+                                        stroke="#22c55e" 
+                                        strokeWidth={3}
+                                        fillOpacity={1} 
+                                        fill="url(#colorValue)" 
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
+                {/* --- FIM DO COFRE --- */}
 
                 {messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-6 text-center space-y-4 animate-in fade-in zoom-in duration-500 opacity-70">
-                        <div className="p-4 rounded-full bg-primary/10 mb-2">
-                            <Sparkles className="w-8 h-8 text-primary" />
-                        </div>
-                        <h2 className="text-xl font-bold">MoneyPlan AI</h2>
                         <p className="text-sm text-muted-foreground">
-                            Digite sobre seus gastos ou peça uma simulação.
+                            Digite <span className="text-primary font-bold">"Guardar 500 reais"</span> para ver o cofre crescer.
                         </p>
                     </div>
                 )}
@@ -236,7 +246,7 @@ const Dashboard = () => {
                             {msg.role === 'assistant' && (
                                 <>
                                     {msg.metrics && <MetricsGrid metrics={msg.metrics} />}
-                                    {msg.charts && <ChartDisplay charts={msg.charts} />}
+                                    {/* Não mostramos o gráfico no chat se ele já está no cofre lá em cima */}
                                 </>
                             )}
                         </div>
@@ -265,7 +275,7 @@ const Dashboard = () => {
         <div className="p-4 bg-background/95 backdrop-blur-xl border-t border-border/30 z-20">
             <div className="max-w-3xl mx-auto">
                 <QueryInput onSubmit={handleQuery} isLoading={isLoading} />
-                <p className="text-center text-[10px] text-muted-foreground mt-2 opacity-50">MoneyPlan$ AI</p>
+                <p className="text-center text-[10px] text-muted-foreground mt-2 opacity-50">MoneyPlan$ AI • Gestão Inteligente</p>
             </div>
         </div>
       </div>
