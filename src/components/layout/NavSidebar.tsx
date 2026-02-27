@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const mainNavItems = [
-  { title: "Chat", path: "/", icon: Home },
+  { title: "Dashboard", path: "/", icon: Home },
   { title: "Metas", path: "/metas", icon: Target },
   { title: "Missões", path: "/missoes", icon: Rocket },
   { title: "Personalidades", path: "/personalidades", icon: Users },
@@ -52,7 +52,7 @@ export function NavSidebar() {
         {/* Grupo A: Navegação Principal */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-2">
-            Abas
+            Navegação
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

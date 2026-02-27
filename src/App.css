@@ -1,13 +1,10 @@
 #root {
-  /* No desktop, mantém o padrão do Vite */
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  width: 100%;
 }
 
-/* --- MANTENDO SEU CÓDIGO ORIGINAL --- */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -22,8 +19,12 @@
 }
 
 @keyframes logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -38,24 +39,4 @@
 
 .read-the-docs {
   color: #888;
-}
-
-/* --- ADICIONE ESTA PARTE PARA ARRUMAR O MOBILE --- */
-@media (max-width: 768px) {
-  #root {
-    /* Reduz o padding para o card não ficar espremido no celular */
-    padding: 1rem; 
-    /* Garante que o conteúdo ocupe a largura total disponível */
-    max-width: 100vw; 
-    /* Alinha o texto à esquerda para um visual mais limpo de dashboard */
-    text-align: left; 
-    /* Remove margens automáticas laterais */
-    margin: 0; 
-  }
-
-  /* Ajuste para evitar que a logo gigante amontoe o topo */
-  .logo {
-    height: 4em;
-    padding: 0.5em;
-  }
 }

@@ -1,447 +1,216 @@
 @tailwind base;
-
 @tailwind components;
-
 @tailwind utilities;
-
-
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-
-
 @layer base {
-
   :root {
-
     --background: 222 47% 4%;
-
     --foreground: 0 0% 95%;
 
-
-
     --card: 222 47% 8%;
-
     --card-foreground: 0 0% 95%;
 
-
-
     --popover: 222 47% 6%;
-
     --popover-foreground: 0 0% 95%;
 
-
-
     --primary: 160 84% 39%;
-
     --primary-foreground: 222 47% 4%;
 
-
-
     --secondary: 270 91% 65%;
-
     --secondary-foreground: 0 0% 100%;
 
-
-
     --muted: 222 30% 12%;
-
     --muted-foreground: 220 10% 55%;
 
-
-
     --accent: 270 91% 65%;
-
     --accent-foreground: 0 0% 100%;
 
-
-
     --destructive: 0 84% 60%;
-
     --destructive-foreground: 0 0% 100%;
 
-
-
     --border: 222 30% 15%;
-
     --input: 222 30% 12%;
-
     --ring: 160 84% 39%;
-
-
 
     --radius: 0.75rem;
 
-
-
     /* Sidebar */
-
     --sidebar: 222 47% 5%;
-
     --sidebar-foreground: 0 0% 95%;
-
     --sidebar-border: 222 30% 12%;
-
     --sidebar-accent: 180 84% 45%;
-
     --sidebar-accent-foreground: 222 47% 4%;
-
     --sidebar-primary: 160 84% 39%;
-
     --sidebar-primary-foreground: 222 47% 4%;
-
     --sidebar-ring: 160 84% 39%;
 
-
-
     /* Custom Neon Colors */
-
     --neon-emerald: 160 84% 39%;
-
     --neon-purple: 270 91% 65%;
-
     --neon-cyan: 180 84% 45%;
-
     --neon-emerald-glow: 160 84% 50%;
-
     --neon-purple-glow: 270 91% 70%;
-
     --neon-cyan-glow: 180 84% 55%;
 
-
-
     /* Gradients */
-
     --gradient-primary: linear-gradient(135deg, hsl(160 84% 39%), hsl(160 84% 30%));
-
     --gradient-accent: linear-gradient(135deg, hsl(270 91% 65%), hsl(280 91% 55%));
-
     --gradient-card: linear-gradient(135deg, hsl(222 47% 10%), hsl(222 47% 6%));
-
     --gradient-hero: linear-gradient(135deg, hsl(160 84% 39% / 0.15), hsl(270 91% 65% / 0.15));
 
-
-
     /* Shadows */
-
     --shadow-neon-emerald: 0 0 20px hsl(160 84% 39% / 0.4), 0 0 40px hsl(160 84% 39% / 0.2);
-
     --shadow-neon-purple: 0 0 20px hsl(270 91% 65% / 0.4), 0 0 40px hsl(270 91% 65% / 0.2);
-
     --shadow-neon-cyan: 0 0 20px hsl(180 84% 45% / 0.4), 0 0 40px hsl(180 84% 45% / 0.2);
-
     --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.4);
-
   }
-
 }
-
-
 
 @layer base {
-
   * {
-
     @apply border-border;
-
   }
-
-
 
   body {
-
     @apply bg-background text-foreground font-sans antialiased;
-
     font-family: 'Inter', sans-serif;
-
-    
-
-    /* --- INÍCIO DA ALTERAÇÃO --- */
-
-    width: 100%;
-
-    min-height: 100vh;
-
-    margin: 0;
-
-    overflow-x: hidden; /* Evita scroll lateral indesejado */
-
-    display: block; /* Garante que não force centralização flexbox */
-
-    /* --- FIM DA ALTERAÇÃO --- */
-
   }
-
-
 
   h1, h2, h3, h4, h5, h6 {
-
     font-family: 'Space Grotesk', sans-serif;
-
   }
-
 }
-
-
 
 @layer components {
-
   .glass-card {
-
     @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl;
-
     box-shadow: var(--shadow-card);
-
   }
-
-
 
   .neon-glow-emerald {
-
     box-shadow: var(--shadow-neon-emerald);
-
   }
-
-
 
   .neon-glow-purple {
-
     box-shadow: var(--shadow-neon-purple);
-
   }
-
-
 
   .text-glow-emerald {
-
     text-shadow: 0 0 10px hsl(160 84% 39% / 0.8), 0 0 20px hsl(160 84% 39% / 0.4);
-
   }
-
-
 
   .text-glow-purple {
-
     text-shadow: 0 0 10px hsl(270 91% 65% / 0.8), 0 0 20px hsl(270 91% 65% / 0.4);
-
   }
-
-
 
   .gradient-border {
-
     position: relative;
-
     background: linear-gradient(var(--card), var(--card)) padding-box,
-
                 linear-gradient(135deg, hsl(160 84% 39%), hsl(270 91% 65%)) border-box;
-
     border: 1px solid transparent;
-
   }
-
-
 
   .animate-pulse-slow {
-
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-
   }
-
-
 
   .animate-pulse-glow {
-
     animation: pulse-glow 2s ease-in-out infinite;
-
   }
-
-
 
   @keyframes pulse-glow {
-
     0%, 100% {
-
       filter: drop-shadow(0 0 4px hsl(30 90% 50% / 0.6));
-
     }
-
     50% {
-
       filter: drop-shadow(0 0 12px hsl(30 90% 50% / 1));
-
     }
-
   }
-
-
 
   .animate-float {
-
     animation: float 6s ease-in-out infinite;
-
   }
-
-
 
   @keyframes float {
-
     0%, 100% { transform: translateY(0); }
-
     50% { transform: translateY(-10px); }
-
   }
-
-
 
   @keyframes scan-line {
-
     0% {
-
       top: -10%;
-
       opacity: 0;
-
     }
-
     5% {
-
       opacity: 1;
-
     }
-
     95% {
-
       opacity: 1;
-
     }
-
     100% {
-
       top: 110%;
-
       opacity: 0;
-
     }
-
   }
-
-
 
   .animate-scan-line {
-
     animation: scan-line 4s ease-in-out infinite;
-
   }
-
-
 
   .animate-bounce-click {
-
     animation: bounce-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
   }
-
-
 
   /* Hexagon shape for achievement badges */
-
   .hexagon {
-
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-
   }
-
-
 
   /* Active navigation item with neon border */
-
   .nav-item-active {
-
     position: relative;
-
     background: hsl(var(--primary) / 0.15);
-
     color: hsl(var(--primary));
-
   }
-
-
 
   .nav-item-active::before {
-
     content: '';
-
     position: absolute;
-
     left: 0;
-
     top: 0;
-
     bottom: 0;
-
     width: 4px;
-
     background: hsl(var(--primary));
-
     box-shadow: 0 0 10px hsl(var(--primary) / 0.6), 0 0 20px hsl(var(--primary) / 0.3);
-
     border-radius: 0 2px 2px 0;
-
   }
-
 }
-
-
 
 @layer utilities {
-
   .scrollbar-thin {
-
     scrollbar-width: thin;
-
     scrollbar-color: hsl(var(--muted)) transparent;
-
   }
-
-
 
   .scrollbar-thin::-webkit-scrollbar {
-
     width: 6px;
-
   }
-
-
 
   .scrollbar-thin::-webkit-scrollbar-track {
-
     background: transparent;
-
   }
-
-
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-
     background: hsl(var(--muted));
-
     border-radius: 3px;
-
   }
-
 }
 
-
-
 /* Hide Lovable badge */
-
 #lovable-badge,
-
 #lovable-badge a,
-
 [id^="lovable-badge"] {
-
   display: none !important;
-
 }

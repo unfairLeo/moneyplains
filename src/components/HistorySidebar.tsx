@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { History, MessageSquare, Menu, Trash2 } from "lucide-react";
-// Importei o seu componente de Logo aqui 👇
-import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo"; 
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -86,21 +84,10 @@ const HistorySidebar = ({
       >
         <SheetHeader className="p-6 border-b border-border/50">
           <SheetTitle className="flex items-center gap-3 text-foreground">
-            
-            {/* --- INÍCIO DA MUDANÇA --- */}
-            
-            {/* 1. A Moeda (Logo) com tamanho médio */}
-            <MoneyPlanLogo size="md" />
-
-            {/* 2. O Texto MoneyPlan$ Estilizado */}
-            <div className="flex items-center text-xl font-bold">
-              <span className="text-primary text-glow-emerald">Money</span>
-              <span className="text-foreground">Plan</span>
-              <span className="text-primary text-glow-emerald">$</span>
+            <div className="p-2 rounded-lg bg-primary/20 neon-glow-emerald">
+              <History className="w-5 h-5 text-primary" />
             </div>
-
-            {/* --- FIM DA MUDANÇA --- */}
-
+            <span className="font-display">Histórico</span>
           </SheetTitle>
         </SheetHeader>
 
