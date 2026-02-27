@@ -21,7 +21,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]); 
   
-  // Estados simplificados (apenas números, sem gráficos complexos no topo)
+  // Estados dos Cards do Topo
   const [saldo, setSaldo] = useState<number>(0);
   const [entradas, setEntradas] = useState<number>(0);
   const [saidas, setSaidas] = useState<number>(0);
@@ -37,22 +37,18 @@ const Dashboard = () => {
     if (scrollRef.current) scrollRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Efeito "Espelho": Atualiza os cards do topo baseado no que o chat responde
+  // Efeito "Espelho" para manter sincronia visual com mensagens antigas
   useEffect(() => {
     if (messages.length > 0) {
         const lastMsg = messages[messages.length - 1];
-        if (lastMsg.role === 'assistant') {
-            // Se a IA mandou métricas, atualiza os cards do topo
-            if (lastMsg.metrics) {
-                lastMsg.metrics.forEach((m: any) => {
-                    const val = parseFloat(m.value.replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
-                    if (m.label.includes("Renda") || m.label.includes("Entrada")) setEntradas(val);
-                    if (m.label.includes("Gasto") || m.label.includes("Saída")) setSaidas(val);
-                    if (m.label.includes("Sobra") || m.label.includes("Saldo") || m.label.includes("Meta")) setSaldo(val);
-                });
-            }
-            // Se a IA mandou um valor de patrimônio direto (net_worth), prioriza ele
-            // (Você pode adicionar essa lógica se o N8N mandar net_worth no futuro)
+        if (lastMsg.role === 'assistant' && lastMsg.metrics) {
+            lastMsg.metrics.forEach((m: any) => {
+                const val = parseFloat(String(m.value).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
+                if (m.label.includes("Renda") || m.label.includes("Entrada")) setEntradas(val);
+                if (m.label.includes("Gasto") || m.label.includes("Saída")) setSaidas(val);
+                // Se a métrica for de saldo, atualiza também
+                if (m.label.includes("Sobra") || m.label.includes("Saldo") || m.label.includes("Meta")) setSaldo(val);
+            });
         }
     }
   }, [messages]);
@@ -88,7 +84,7 @@ const Dashboard = () => {
 
       const raw = await res.json();
       
-      // Processamento básico
+      // Processamento básico de Gráficos
       let generatedCharts = raw.charts || [];
       if (raw.labels && raw.valores) {
            generatedCharts = [{
@@ -97,8 +93,19 @@ const Dashboard = () => {
            }];
       }
 
+      // Processamento de Métricas e Variáveis
       let generatedMetrics = raw.metrics || [];
       const v = raw.variaveis_matematicas || {};
+
+      // --- CORREÇÃO DO BASE44 APLICADA AQUI ---
+      // Atualiza patrimônio diretamente se a IA retornar net_worth
+      if (raw.net_worth !== undefined) {
+          // Limpa o valor (tira R$, pontos, etc) e seta o estado
+          const cleanNetWorth = parseFloat(String(raw.net_worth).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
+          setSaldo(cleanNetWorth);
+      }
+      // ----------------------------------------
+
       if (v.renda_mensal) generatedMetrics.push({ label: "Renda Mensal", value: `R$ ${v.renda_mensal}`, change: "Entrada", trend: "up" });
       if (v.gasto_mensal) generatedMetrics.push({ label: "Gasto Mensal", value: `R$ ${v.gasto_mensal}`, change: "Saída", trend: "down" });
       if (v.sobra_mensal) generatedMetrics.push({ label: "Sobra/Saldo", value: `R$ ${v.sobra_mensal}`, change: "Acumulado", trend: "neutral" });
@@ -157,10 +164,9 @@ const Dashboard = () => {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
             <div className="max-w-3xl mx-auto space-y-6 pb-4">
                 
-                {/* --- NOVO PAINEL SIMPLIFICADO (3 CARDS) --- */}
-                {/* Ele aparece sempre, não precisa ativar, e não quebra */}
+                {/* --- PAINEL EXECUTIVO (3 CARDS) --- */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    {/* Card 1: Saldo/Patrimônio */}
+                    {/* Card 1: Patrimônio (Atualizado pelo net_worth) */}
                     <div className="p-4 rounded-2xl bg-card border border-border/50 shadow-sm flex items-center gap-4">
                         <div className="p-3 rounded-xl bg-primary/10 text-primary">
                             <Wallet className="w-6 h-6" />
