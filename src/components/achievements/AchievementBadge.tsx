@@ -14,6 +14,7 @@ import {
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider, // IMPORTANTE: Adicionei o Provider
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Achievement } from "@/types/achievements";
@@ -31,41 +32,30 @@ const iconMap: Record<string, React.ElementType> = {
   gem: Gem,
 };
 
-// 1. ALTERAÇÃO AQUI: Melhorei as cores e adicionei a propriedade 'text' que faltava
+// Definição de estilos segura
 const tierStyles = {
   bronze: {
-    // Fundo: Um marrom alaranjado muito suave e transparente que desvanece para o fundo do app
     bg: "bg-gradient-to-b from-orange-500/10 via-orange-900/5 to-transparent",
-    // Borda: Laranja escuro, sutil
-    border: "border-orange-500/20 border-b-orange-600/50 border-b-4",
-    // Ícone: Laranja vibrante
+    border: "border-orange-500/20 border-b-orange-600/50", // Removi border-b-4 aqui para por na classe base
     icon: "text-orange-500",
     text: "text-orange-400",
-    // Glow: Sombra laranja suave
+    shadow: "shadow-orange-500/10", // Nova prop para sombra base
     glow: "group-hover:shadow-[0_0_30px_rgba(249,115,22,0.15)]"
   },
-  
   silver: {
-    // Fundo: Branco/Azulado transparente (frio)
     bg: "bg-gradient-to-b from-slate-400/10 via-slate-800/5 to-transparent",
-    // Borda: Cinza metálico
-    border: "border-slate-400/20 border-b-slate-500/50 border-b-4",
-    // Ícone: Prata claro
+    border: "border-slate-400/20 border-b-slate-500/50",
     icon: "text-slate-300",
-    text: "text-slate-300",
-    // Glow: Sombra branca/azulada
+    text: "text-slate-200", // Mais claro para ler melhor
+    shadow: "shadow-slate-500/10",
     glow: "group-hover:shadow-[0_0_30px_rgba(148,163,184,0.15)]"
   },
-  
   gold: {
-    // Fundo: Amarelo/Dourado transparente (quente e rico)
     bg: "bg-gradient-to-b from-yellow-400/10 via-yellow-900/5 to-transparent",
-    // Borda: Ouro forte
-    border: "border-yellow-400/20 border-b-yellow-500/50 border-b-4",
-    // Ícone: Ouro vibrante
+    border: "border-yellow-400/20 border-b-yellow-500/50",
     icon: "text-yellow-400",
     text: "text-yellow-400",
-    // Glow: Sombra dourada mais forte que as outras
+    shadow: "shadow-yellow-500/10",
     glow: "group-hover:shadow-[0_0_30px_rgba(250,204,21,0.2)]"
   },
 };
@@ -75,85 +65,90 @@ interface AchievementBadgeProps {
 }
 
 export function AchievementBadge({ achievement }: AchievementBadgeProps) {
-  // Fallback para evitar erro se o ícone não existir no mapa
-  const Icon = iconMap[achievement.icon?.toLowerCase()] || Trophy; 
+  const Icon = iconMap[achievement.icon?.toLowerCase()] || Trophy;
   
-  // Fallback para tier
-  const tier = tierStyles[achievement.tier as keyof typeof tierStyles] || tierStyles.bronze;
+  // Garante que 'tier' seja uma chave válida, senão usa 'bronze'
+  const tierKey = (achievement.tier?.toLowerCase() as keyof typeof tierStyles) || "bronze";
+  const tier = tierStyles[tierKey];
 
-  // 2. ALTERAÇÃO AQUI: CARD BLOQUEADO (Estilo Fantasma)
+  // CARD BLOQUEADO
   if (!achievement.isUnlocked) {
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex flex-col items-center justify-center p-4 w-32 h-40 rounded-2xl border-2 border-dashed border-muted bg-muted/5 opacity-50 grayscale transition-all hover:opacity-80 hover:bg-muted/10 cursor-not-allowed">
-            <div className="p-3 rounded-full bg-muted/20 mb-3">
-               <Lock className="w-6 h-6 text-muted-foreground" />
+      <TooltipProvider> {/* Envolvi com Provider para garantir que funcione isolado */}
+        <Tooltip delayDuration={300}>
+          <TooltipTrigger asChild>
+            <div className="flex flex-col items-center justify-center p-4 w-32 h-40 rounded-2xl border-2 border-dashed border-muted bg-muted/5 opacity-50 grayscale transition-all duration-300 hover:opacity-100 hover:bg-muted/10 cursor-not-allowed group">
+              <div className="p-3 rounded-full bg-muted/20 mb-3 group-hover:scale-110 transition-transform">
+                <Lock className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <span className="text-xs font-bold text-muted-foreground text-center px-2">
+                Bloqueado
+              </span>
             </div>
-            <span className="text-xs font-bold text-muted-foreground text-center">
-              Bloqueado
-            </span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="top" className="glass-card border-border/50">
-          <p className="font-medium mb-1">{achievement.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {achievement.unlockCondition}
-          </p>
-        </TooltipContent>
-      </Tooltip>
+          </TooltipTrigger>
+          <TooltipContent className="glass-card border-border/50 bg-black/90 text-white">
+            <p className="font-medium mb-1">{achievement.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {achievement.unlockCondition || "Continue usando o app para descobrir."}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   }
 
-  // 3. ALTERAÇÃO AQUI: CARD DESBLOQUEADO (Estilo 3D Colorido)
+  // CARD DESBLOQUEADO
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div
-          className={cn(
-            "relative group flex flex-col items-center justify-center p-4 w-32 h-40 transition-all duration-300 cursor-pointer",
-            "rounded-2xl border-2 backdrop-blur-sm", // Formato de carta arredondada
-            "hover:-translate-y-2 hover:scale-105", // Efeito de pulo (3D)
-            tier.bg,
-            tier.border,
-            tier.glow
-          )}
-        >
-          {/* Círculo atrás do ícone para destaque */}
-          <div className={cn(
-            "p-3 rounded-full mb-3 transition-transform duration-500 group-hover:rotate-12 bg-background/30 backdrop-blur-md",
-            achievement.tier === "gold" && "animate-pulse-glow"
-          )}>
-            <Icon className={cn("w-8 h-8", tier.icon)} />
-          </div>
-          
-          <span className={cn("text-xs font-bold text-center leading-tight px-1", tier.text)}>
-            {achievement.name}
-          </span>
-
-          {/* Badge de "Novo" opcional se quiser adicionar lógica depois */}
-          {/* <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary animate-ping" /> */}
-        </div>
-      </TooltipTrigger>
-      
-      <TooltipContent side="top" className="glass-card border-border/50">
-        <div className="text-center">
-          <p className={cn("font-bold mb-1 text-sm", tier.text)}>{achievement.name}</p>
-          <p className="text-xs text-muted-foreground max-w-[180px] mb-2">
-            {achievement.description}
-          </p>
-          {achievement.unlockedAt && (
-            <div className="pt-2 border-t border-border/30">
-              <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">
-                Desbloqueado em
-              </p>
-              <p className="text-xs text-muted-foreground">
-                 {new Intl.DateTimeFormat("pt-BR").format(new Date(achievement.unlockedAt))}
-              </p>
+    <TooltipProvider>
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger asChild>
+          <div
+            className={cn(
+              "relative group flex flex-col items-center justify-center p-4 w-32 h-40 transition-all duration-300 cursor-pointer",
+              "rounded-2xl border-t border-l border-r border-b-4 backdrop-blur-sm", // Borda base
+              "hover:-translate-y-2 hover:scale-105 hover:z-10", // Efeito 3D
+              tier.bg,
+              tier.border,
+              tier.glow,
+              tier.shadow // Sombra base suave
+            )}
+          >
+            {/* Ícone com fundo brilhante */}
+            <div className={cn(
+              "p-3 rounded-full mb-3 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110 bg-background/40 backdrop-blur-md shadow-inner",
+              achievement.tier === "gold" && "animate-pulse-glow ring-2 ring-yellow-500/20"
+            )}>
+              <Icon className={cn("w-8 h-8 drop-shadow-md", tier.icon)} />
             </div>
-          )}
-        </div>
-      </TooltipContent>
-    </Tooltip>
+            
+            <span className={cn("text-xs font-bold text-center leading-tight px-1 drop-shadow-sm", tier.text)}>
+              {achievement.name}
+            </span>
+            
+            {/* Efeito de brilho ao passar o mouse (opcional) */}
+            <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+          </div>
+        </TooltipTrigger>
+        
+        <TooltipContent side="top" className="glass-card border-border/50 bg-black/90 p-4">
+          <div className="text-center space-y-2">
+            <p className={cn("font-bold text-sm", tier.text)}>{achievement.name}</p>
+            <p className="text-xs text-muted-foreground max-w-[180px]">
+              {achievement.description}
+            </p>
+            {achievement.unlockedAt && (
+              <div className="pt-2 border-t border-white/10 mt-2">
+                <p className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">
+                  Conquistado em
+                </p>
+                <p className="text-xs font-mono text-muted-foreground">
+                  {new Date(achievement.unlockedAt).toLocaleDateString('pt-BR')}
+                </p>
+              </div>
+            )}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
