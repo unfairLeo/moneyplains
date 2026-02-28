@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const mainNavItems = [
-  { title: "Dashboard", path: "/", icon: Home },
+  { title: "Chat", path: "/", icon: Home },
   { title: "Metas", path: "/metas", icon: Target },
   { title: "Missões", path: "/missoes", icon: Rocket },
   { title: "Personalidades", path: "/personalidades", icon: Users },
