@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // n8n webhook URL
-const API_URL = "https://zoleon.app.n8n.cloud/webhook/68819970-dbf1-49df-8e8b-d8c871e7301c";
+const API_URL = "https://dgoleo.app.n8n.cloud/webhook/68819970-dbf1-49df-8e8b-d8c871e7301c";
 
 // Timeout in milliseconds (60 seconds)
 const FETCH_TIMEOUT = 60000;
