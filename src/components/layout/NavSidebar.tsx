@@ -32,11 +32,11 @@ export function NavSidebar() {
 
   return (
     <Sidebar
-      className="border-r border-border/30 bg-sidebar"
+      className="border-r border-white/10 bg-black/30 backdrop-blur-md"
       collapsible="icon"
     >
       {/* Header com Logo */}
-      <SidebarHeader className="p-4 border-b border-border/30">
+      <SidebarHeader className="p-4 border-b border-white/10">
         <div className="flex items-center gap-3">
           <MoneyPlanLogo size="md" />
           {!isCollapsed && (
@@ -98,7 +98,7 @@ export function NavSidebar() {
       </SidebarContent>
 
       {/* Footer com Botão de Colapso */}
-      <SidebarFooter className="p-4 border-t border-border/30">
+      <SidebarFooter className="p-4 border-t border-white/10">
         <Button
           variant="ghost"
           onClick={toggleSidebar}
