@@ -83,7 +83,7 @@ const Dashboard = () => {
     setMessages(prev => [...prev, userMessage]);
 
     const validation = validateQuery(query);
-    if (!validation.success) {
+    if (validation.success === false) {
       toast({ title: "Inválido", description: validation.error, variant: "destructive" });
       return;
     }

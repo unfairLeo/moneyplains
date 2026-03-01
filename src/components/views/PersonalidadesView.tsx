@@ -21,7 +21,7 @@ export function PersonalidadesView() {
       </header>
 
       {/* Info Banner */}
-      <div className="glass-card p-4 mb-8 border-secondary/30 flex items-start gap-3">
+      <div className="glass-card p-4 mb-8 border-secondary/30 flex items-start gap-3 animate-stagger-in stagger-1">
         <div className="p-2 rounded-lg bg-secondary/20 flex-shrink-0">
           <Info className="w-5 h-5 text-secondary" />
         </div>
@@ -38,8 +38,10 @@ export function PersonalidadesView() {
 
       {/* Personas Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {defaultPersonas.map((persona) => (
-          <PersonaCard key={persona.id} persona={persona} />
+        {defaultPersonas.map((persona, index) => (
+          <div key={persona.id} className={`animate-stagger-in stagger-${index + 1}`}>
+            <PersonaCard persona={persona} />
+          </div>
         ))}
       </div>
     </div>

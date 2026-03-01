@@ -158,7 +158,7 @@ export function ChatView() {
       </header>
 
       {/* Wealth + Streak Row */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6 animate-stagger-in stagger-1">
         <div className="flex-1">
           <WealthWidget patrimony={netWorth ?? undefined} />
         </div>
@@ -166,12 +166,12 @@ export function ChatView() {
       </div>
 
       {/* Smart Actions */}
-      <div className="glass-card p-5 mb-6">
+      <div className="glass-card p-5 mb-6 animate-stagger-in stagger-2">
         <SmartActions onAction={handleSmartAction} />
       </div>
 
       {/* Query Input */}
-      <div className="glass-card p-6 mb-8">
+      <div className="glass-card p-6 mb-8 animate-stagger-in stagger-3">
         <QueryInput
           onSubmit={handleQuery}
           isLoading={isLoading}
@@ -245,7 +245,7 @@ export function ChatView() {
 
         {/* Empty State */}
         {!response && !isLoading && !error && (
-          <div className="glass-card p-12 text-center animate-fade-in">
+          <div className="glass-card p-12 text-center animate-stagger-in stagger-4">
             <div className="inline-flex p-4 rounded-2xl bg-muted/50 mb-4">
               <MoneyPlanLogo size="lg" />
             </div>
