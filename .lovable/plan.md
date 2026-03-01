@@ -1,131 +1,35 @@
 
 
-## Ajuste da Integracao com o Webhook n8n
+## Plano de Implementacao
 
-### Problema Atual
+### 1. Trocar a imagem de fundo do projeto
 
-O frontend espera um `ApiResponse` com campos `{ title, metrics, charts, conversation }`, mas o backend envia:
+Atualmente, o fundo do app e gerado por CSS (circulos com blur e grid pattern no `AppLayout.tsx`, linhas 34-48). O plano e:
 
-```text
-{
-  "resposta": "Texto da conversa",
-  "intencao": "grafico" | "conversa",
-  "variaveis_matematicas": { "net_worth": 1000, ... },
-  "labels": ["Jan", "Fev", ...],
-  "valores": [100, 200, ...]
-}
-```
+- Copiar a imagem enviada (`user-uploads://fundompsemimg.png`) para `src/assets/fundompsemimg.png`
+- No `AppLayout.tsx`, substituir os efeitos de fundo CSS atuais (divs com blur/grid) por uma tag `<img>` usando a imagem importada, posicionada com `fixed inset-0 object-cover` e `pointer-events-none`, mantendo o `z-0`
 
-Resultado: os dados chegam mas nenhum campo e mapeado corretamente -- o chat nao exibe a resposta, os graficos nao renderizam e o patrimonio permanece estatico.
+### 2. Adicionar Select (Dropdown) no card da Maquina do Tempo
 
----
+No componente `TimeMachineSimulator.tsx`, adicionar um `Select` estilizado no canto superior direito do header do card. O dropdown permitira escolher o tipo de investimento/cenario de simulacao (ex: "Conservador", "Moderado", "Arrojado"), ajustando automaticamente a taxa de rentabilidade.
 
-### Solucao: Camada de Transformacao + Estado Global de Patrimonio
+**Mudancas tecnicas:**
 
-#### 1. Novo tipo `BackendResponse` (api.ts)
+- Importar o componente `Select` do shadcn (`@/components/ui/select`)
+- Adicionar estado `investmentProfile` com opcoes como:
+  - Conservador (6% a.a.)
+  - Moderado (10% a.a.)
+  - Arrojado (15% a.a.)
+  - Personalizado (valor manual atual)
+- Posicionar o Select no header do card usando `flex justify-between` (ja existe parcialmente)
+- Ao selecionar um perfil, atualizar o slider de rentabilidade automaticamente; ao escolher "Personalizado", manter o controle manual
+- Estilizar o Select com classes consistentes com o design system (glass-card, cores neon)
 
-Criar a interface que representa exatamente o que o n8n envia, e uma funcao `transformBackendResponse` que converte para o `ApiResponse` que o frontend ja consome.
+### Arquivos modificados
 
-Mapeamento:
-- `resposta` -> `conversation` (texto do assistente)
-- `intencao === "grafico"` -> gera um `ChartItem` do tipo `bar` usando `labels` como `name` e `valores` como `value`
-- `variaveis_matematicas.net_worth` -> extraido e retornado separadamente para atualizar o WealthWidget
-- `titulo` (se vier vazio, gerar titulo automatico baseado na intencao)
-
-#### 2. Modificar ChatView.tsx
-
-Na funcao `handleQuery`, apos parsear o JSON:
-- Chamar `transformBackendResponse(rawData)` ao inves de fazer cast direto para `ApiResponse`
-- Adicionar `console.log` com label claro em cada etapa: raw response, dados transformados, erros
-- Se `net_worth` vier na resposta, atualizar um novo estado `netWorth` que sera passado como prop para o `WealthWidget`
-
-#### 3. Modificar WealthWidget.tsx
-
-O componente ja aceita `patrimony` como prop (default 12450). Basta o `ChatView` passar o valor real quando disponivel. Nenhuma mudanca estrutural no widget -- apenas receber o valor atualizado.
-
----
-
-### Resumo dos Arquivos
-
-| Arquivo | Acao |
-|---------|------|
-| `src/types/api.ts` | **Modificar** - Adicionar `BackendResponse` e funcao `transformBackendResponse` |
-| `src/components/views/ChatView.tsx` | **Modificar** - Usar transformacao, estado de patrimonio, console.logs de debug |
-| `src/components/wealth/WealthWidget.tsx` | **Nenhuma mudanca** - Ja aceita `patrimony` como prop |
-
----
-
-### Detalhes Tecnicos
-
-#### api.ts - Novo Tipo e Transformacao
-
-```text
-Interface BackendResponse:
-  resposta: string
-  intencao: "grafico" | "conversa"
-  titulo?: string
-  tipo_grafico?: string
-  variaveis_matematicas?: {
-    net_worth?: number
-    renda_mensal?: number
-    gasto_mensal?: number
-    sobra_mensal?: number
-    meta_total?: number
-  }
-  labels?: string[]
-  valores?: number[]
-
-Funcao transformBackendResponse(raw: BackendResponse):
-  retorna { apiResponse: ApiResponse, netWorth: number | null }
-
-  Logica:
-  1. conversation = raw.resposta || undefined
-  2. title = raw.titulo || (raw.intencao === "grafico" ? "Analise Financeira" : undefined)
-  3. Se intencao === "grafico" E labels/valores existem e tem length > 0:
-     - Montar ChartItem com type = (raw.tipo_grafico || "bar")
-     - data = labels.map((label, i) => ({ name: label, value: valores[i] || 0 }))
-     - charts = [chartItem]
-  4. Se variaveis_matematicas existem e tem valores > 0:
-     - Montar MetricItem[] com renda, gasto, sobra (apenas os que forem > 0)
-  5. netWorth = raw.variaveis_matematicas?.net_worth ?? null
-```
-
-#### ChatView.tsx - Mudancas
-
-```text
-Novos estados:
-  const [netWorth, setNetWorth] = useState<number | null>(null)
-
-Na funcao handleQuery, apos JSON.parse:
-  console.log("[MoneyPlan] Raw API response:", rawData)
-
-  const { apiResponse, netWorth: newNetWorth } = transformBackendResponse(rawData)
-
-  console.log("[MoneyPlan] Transformed response:", apiResponse)
-  console.log("[MoneyPlan] Net worth:", newNetWorth)
-
-  setResponse(apiResponse)
-
-  if (newNetWorth !== null) {
-    setNetWorth(newNetWorth)
-  }
-
-  saveConversation(query, apiResponse)
-
-No bloco de catch:
-  console.error("[MoneyPlan] API Error:", err)
-
-No JSX, passar netWorth para WealthWidget:
-  <WealthWidget patrimony={netWorth ?? undefined} />
-```
-
-#### Console.log Strategy
-
-Logs com prefixo `[MoneyPlan]` em 4 pontos criticos:
-1. `[MoneyPlan] Raw API response:` - JSON bruto recebido do n8n
-2. `[MoneyPlan] Transformed response:` - ApiResponse apos transformacao
-3. `[MoneyPlan] Net worth:` - Valor extraido do net_worth
-4. `[MoneyPlan] API Error:` - Qualquer erro durante o fetch/parse
-
-Isso permite abrir o console do navegador e filtrar por "[MoneyPlan]" para ver exatamente o que esta chegando e como esta sendo transformado.
+| Arquivo | Alteracao |
+|---|---|
+| `src/assets/fundompsemimg.png` | Novo arquivo (copia da imagem) |
+| `src/components/layout/AppLayout.tsx` | Substituir efeitos CSS de fundo pela imagem |
+| `src/components/metas/TimeMachineSimulator.tsx` | Adicionar Select de perfil de investimento no header |
 
