@@ -78,12 +78,14 @@ const HistorySidebar = ({
           <Menu className="w-5 h-5" />
         </Button>
       </SheetTrigger>
+      
       <SheetContent
         side="left"
-        className="w-80 bg-background/95 backdrop-blur-xl border-r border-border/50 p-0"
+        // [ALTERAÇÃO AQUI] Troquei bg-background/95 por bg-black/20 para ficar transparente e mostrar a foto de fundo
+        className="w-80 bg-black/20 backdrop-blur-md border-r border-white/10 p-0 shadow-2xl"
       >
-        <SheetHeader className="p-6 border-b border-border/50">
-          <SheetTitle className="flex items-center gap-3 text-foreground">
+        <SheetHeader className="p-6 border-b border-white/10"> {/* [OPCIONAL] Também suavizei a borda do header aqui */}
+          <SheetTitle className="flex items-center gap-3 text-white">
             <div className="p-2 rounded-lg bg-primary/20 neon-glow-emerald">
               <History className="w-5 h-5 text-primary" />
             </div>
@@ -100,7 +102,7 @@ const HistorySidebar = ({
                 className={`w-full text-left p-4 rounded-xl transition-all duration-300 group ${
                   selectedId === conversation.id
                     ? "bg-primary/20 border border-primary/50"
-                    : "bg-muted/30 hover:bg-muted/50 border border-transparent hover:border-border/50"
+                    : "bg-black/30 hover:bg-black/50 border border-transparent hover:border-white/10" // [AJUSTE] Melhorei o hover para combinar com o fundo escuro
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -108,7 +110,7 @@ const HistorySidebar = ({
                     className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
                       selectedId === conversation.id
                         ? "bg-primary/30 text-primary"
-                        : "bg-muted text-muted-foreground group-hover:text-foreground"
+                        : "bg-white/5 text-gray-400 group-hover:text-white"
                     }`}
                   >
                     <MessageSquare className="w-4 h-4" />
@@ -118,24 +120,24 @@ const HistorySidebar = ({
                       className={`font-medium transition-colors text-sm leading-tight ${
                         selectedId === conversation.id
                           ? "text-primary"
-                          : "text-foreground"
+                          : "text-gray-200"
                       }`}
                     >
                       {truncateText(conversation.query, 50)}
                     </h4>
                     {conversation.response.conversation && (
-                      <p className="text-xs text-muted-foreground truncate mt-1">
+                      <p className="text-xs text-gray-500 truncate mt-1">
                         {truncateText(conversation.response.conversation, 40)}
                       </p>
                     )}
-                    <span className="text-xs text-muted-foreground/70 mt-2 block">
+                    <span className="text-xs text-gray-600 mt-2 block">
                       {formatRelativeDate(conversation.timestamp)}
                     </span>
                   </div>
                   {onDeleteConversation && (
                     <button
                       onClick={(e) => handleDelete(e, conversation.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/20 hover:text-destructive transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/20 hover:text-red-500 transition-all"
                       title="Deletar conversa"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -147,13 +149,13 @@ const HistorySidebar = ({
 
             {history.length === 0 && (
               <div className="text-center py-12">
-                <div className="inline-flex p-4 rounded-2xl bg-muted/30 mb-4">
-                  <MessageSquare className="w-8 h-8 text-muted-foreground" />
+                <div className="inline-flex p-4 rounded-2xl bg-white/5 mb-4">
+                  <MessageSquare className="w-8 h-8 text-gray-500" />
                 </div>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-gray-400 text-sm">
                   Nenhuma conversa ainda
                 </p>
-                <p className="text-muted-foreground/70 text-xs mt-1">
+                <p className="text-gray-600 text-xs mt-1">
                   Faça uma pergunta para começar
                 </p>
               </div>
