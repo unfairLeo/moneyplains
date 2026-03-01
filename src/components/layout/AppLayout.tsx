@@ -32,21 +32,11 @@ function AppLayoutContent() {
           {/* Content */}
           <main className="flex-1 overflow-auto">
             {/* Background Effects */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-              <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
-              <div
-                className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-float"
-                style={{ animationDelay: "-3s" }}
-              />
-              <div
-                className="absolute inset-0 opacity-[0.02]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(hsl(220 20% 18%) 1px, transparent 1px), linear-gradient(90deg, hsl(220 20% 18%) 1px, transparent 1px)",
-                  backgroundSize: "50px 50px",
-                }}
-              />
-            </div>
+            <img
+              src={bgImage}
+              alt=""
+              className="fixed inset-0 w-full h-full object-cover pointer-events-none z-0"
+            />
 
             {/* Page Content */}
             <div className="relative z-10">
