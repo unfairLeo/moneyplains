@@ -217,7 +217,7 @@ export function TimeMachineSimulator() {
         <SliderInput
           label="Rentabilidade"
           value={annualRate}
-          onChange={setAnnualRate}
+          onChange={handleRateChange}
           min={1}
           max={20}
           step={0.5}
