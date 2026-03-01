@@ -4,6 +4,13 @@ import { Clock, Sparkles, TrendingUp } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AreaChart,
   Area,
   XAxis,
@@ -12,6 +19,13 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+
+const INVESTMENT_PROFILES: Record<string, { label: string; rate: number | null }> = {
+  conservador: { label: "Conservador", rate: 6 },
+  moderado: { label: "Moderado", rate: 10 },
+  arrojado: { label: "Arrojado", rate: 15 },
+  personalizado: { label: "Personalizado", rate: null },
+};
 
 function calculateCompoundInterest(
   monthlyInvestment: number,
@@ -126,7 +140,20 @@ export function TimeMachineSimulator() {
   const [monthlyInvestment, setMonthlyInvestment] = useState(500);
   const [years, setYears] = useState(10);
   const [annualRate, setAnnualRate] = useState(10);
+  const [investmentProfile, setInvestmentProfile] = useState("moderado");
 
+  const handleProfileChange = (profile: string) => {
+    setInvestmentProfile(profile);
+    const rate = INVESTMENT_PROFILES[profile]?.rate;
+    if (rate !== null && rate !== undefined) {
+      setAnnualRate(rate);
+    }
+  };
+
+  const handleRateChange = (value: number) => {
+    setAnnualRate(value);
+    setInvestmentProfile("personalizado");
+  };
   const chartData = useMemo(
     () => calculateCompoundInterest(monthlyInvestment, years, annualRate),
     [monthlyInvestment, years, annualRate]
@@ -139,16 +166,30 @@ export function TimeMachineSimulator() {
   return (
     <div className="glass-card p-6 md:p-8 mt-10">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 rounded-xl bg-secondary/20 neon-glow-purple">
-          <Clock className="w-7 h-7 text-secondary" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-secondary/20 neon-glow-purple">
+            <Clock className="w-7 h-7 text-secondary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-display font-bold">A Máquina do Tempo</h2>
+            <p className="text-sm text-muted-foreground">
+              Simule seus investimentos e veja seu futuro
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-display font-bold">A Máquina do Tempo</h2>
-          <p className="text-sm text-muted-foreground">
-            Simule seus investimentos e veja seu futuro
-          </p>
-        </div>
+        <Select value={investmentProfile} onValueChange={handleProfileChange}>
+          <SelectTrigger className="w-[160px] glass-card border-border/50 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(INVESTMENT_PROFILES).map(([key, { label }]) => (
+              <SelectItem key={key} value={key}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Sliders */}
@@ -176,7 +217,7 @@ export function TimeMachineSimulator() {
         <SliderInput
           label="Rentabilidade"
           value={annualRate}
-          onChange={setAnnualRate}
+          onChange={handleRateChange}
           min={1}
           max={20}
           step={0.5}
