@@ -21,10 +21,10 @@ import {
 } from "recharts";
 
 const INVESTMENT_PROFILES: Record<string, { label: string; rate: number | null }> = {
-  conservador: { label: "Conservador", rate: 6 },
-  moderado: { label: "Moderado", rate: 10 },
-  arrojado: { label: "Arrojado", rate: 15 },
-  personalizado: { label: "Personalizado", rate: null },
+  Poupança: { label: "Poupança", rate: 6 },
+  CDB: { label: "CDB", rate: 10 },
+  FI: { label: "Fundos Imobiliarios", rate: 15 },
+  Acoes: { label: "Ações", rate: null },
 };
 
 function calculateCompoundInterest(
