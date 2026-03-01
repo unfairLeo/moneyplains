@@ -32,7 +32,7 @@ export function NavSidebar() {
 
   return (
     <Sidebar
-      className="border-r border-border/30 bg-sidebar"
+      className="border-r border-white/10 bg-black/30 backdrop-blur-md"
       collapsible="icon"
     >
       {/* Header com Logo */}
