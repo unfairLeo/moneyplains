@@ -137,6 +137,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function TimeMachineSimulator() {
+  const [monthlyInvestment, setMonthlyInvestment] = useState(500);
+  const [years, setYears] = useState(10);
+  const [annualRate, setAnnualRate] = useState(10);
   const [investmentProfile, setInvestmentProfile] = useState("moderado");
 
   const handleProfileChange = (profile: string) => {
