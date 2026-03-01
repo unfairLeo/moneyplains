@@ -20,11 +20,24 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const INVESTMENT_PROFILES: Record<string, { label: string; rate: number | null }> = {
-  Poupança: { label: "Poupança", rate: 6 },
-  CDB: { label: "CDB", rate: 10 },
-  FI: { label: "Fundos Imobiliarios", rate: 15 },
-  Acoes: { label: "Ações", rate: null },
+// Use chaves simples (sem acento) para evitar bugs
+const INVESTMENT_PROFILES: Record<string, { label: string; rate: number }> = {
+  poupanca: { 
+    label: "Poupança", 
+    rate: 0.06 // 6% ao ano (Use ponto, não vírgula!)
+  },
+  cdb: { 
+    label: "CDB / Renda Fixa", 
+    rate: 0.10 // 10% ao ano
+  },
+  fii: { 
+    label: "Fundos Imobiliários", 
+    rate: 0.12 // 12% ao ano
+  },
+  acoes: { 
+    label: "Ações (Bolsa)", 
+    rate: 0.15 // 15% (Média estimada para não quebrar o gráfico)
+  },
 };
 
 function calculateCompoundInterest(
