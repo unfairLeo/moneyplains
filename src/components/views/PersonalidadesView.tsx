@@ -21,7 +21,7 @@ export function PersonalidadesView() {
       </header>
 
       {/* Info Banner */}
-      <div className="glass-card p-4 mb-8 border-secondary/30 flex items-start gap-3">
+      <div className="glass-card p-4 mb-8 border-secondary/30 flex items-start gap-3 animate-stagger-in stagger-1">
         <div className="p-2 rounded-lg bg-secondary/20 flex-shrink-0">
           <Info className="w-5 h-5 text-secondary" />
         </div>

@@ -245,7 +245,7 @@ export function ChatView() {
 
         {/* Empty State */}
         {!response && !isLoading && !error && (
-          <div className="glass-card p-12 text-center animate-fade-in">
+          <div className="glass-card p-12 text-center animate-stagger-in stagger-4">
             <div className="inline-flex p-4 rounded-2xl bg-muted/50 mb-4">
               <MoneyPlanLogo size="lg" />
             </div>

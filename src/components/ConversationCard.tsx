@@ -73,7 +73,7 @@ const ConversationCard = ({ text }: ConversationCardProps) => {
   };
 
   return (
-    <div className="glass-card p-6 animate-slide-in-left group hover:border-secondary/40 transition-all duration-300">
+    <div className="glass-card p-6 animate-stagger-in stagger-3 group hover:border-secondary/40 transition-all duration-300">
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0 p-2 rounded-xl bg-secondary/20 neon-glow-purple group-hover:scale-110 transition-transform duration-300">
           <Bot className="w-6 h-6 text-secondary animate-pulse" />

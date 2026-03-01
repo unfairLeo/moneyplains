@@ -163,6 +163,33 @@
     animation: bounce-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
+  /* Staggered fade-in for premium entry animations */
+  @keyframes stagger-fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+      filter: blur(4px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  .animate-stagger-in {
+    animation: stagger-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.12s; }
+  .stagger-3 { animation-delay: 0.2s; }
+  .stagger-4 { animation-delay: 0.28s; }
+  .stagger-5 { animation-delay: 0.36s; }
+  .stagger-6 { animation-delay: 0.44s; }
+  .stagger-7 { animation-delay: 0.52s; }
+  .stagger-8 { animation-delay: 0.6s; }
+
   /* Hexagon shape for achievement badges */
   .hexagon {
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);

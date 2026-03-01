@@ -56,8 +56,8 @@ export function NavSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {mainNavItems.map((item, index) => (
+                <SidebarMenuItem key={item.title} className={`animate-stagger-in stagger-${index + 1}`}>
                   <SidebarMenuButton asChild tooltip={item.title} size="lg">
                     <NavLink
                       to={item.path}
