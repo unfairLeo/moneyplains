@@ -190,21 +190,19 @@ const Dashboard = () => {
           
           <div className="flex-1 flex flex-col relative h-full w-full">
             
-            {/* --- CABEÇALHO LIMPO --- */}
-            {/* Header Transparente e Sem Bordas */}
-  <header className="flex items-center justify-between px-6 py-4 z-20 shrink-0 bg-transparent">
-    <div className="flex items-center gap-2">
-        <MoneyPlanLogo size="sm" />
-        {/* Adicionei uma sombra leve no texto para ler melhor em cima da imagem */}
-        <h1 className="text-lg font-bold tracking-tight drop-shadow-md">
-            MoneyPlan<span className="text-primary">$</span>
-        </h1>
-    </div>
-    
-    <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
-        {/* Espaço vazio ou data */}
-    </div>
-</header>
+            {/* --- CABEÇALHO LIMPO (Agora indentado corretamente) --- */}
+            <header className="flex items-center justify-between px-6 py-4 z-20 shrink-0 bg-transparent">
+                <div className="flex items-center gap-2">
+                    <MoneyPlanLogo size="sm" />
+                    <h1 className="text-lg font-bold tracking-tight drop-shadow-md">
+                        MoneyPlan<span className="text-primary">$</span>
+                    </h1>
+                </div>
+                
+                <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
+                    {/* Espaço vazio ou data */}
+                </div>
+            </header>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
                 <div className="max-w-4xl mx-auto space-y-6 pb-4">
@@ -240,7 +238,7 @@ const Dashboard = () => {
                                 {/* Direita: STREAK + SELECT (Alinhados) */}
                                 <div className="flex flex-col items-end gap-3">
                                     
-                                    {/* O STREAK AGORA MORA AQUI (Substituiu o botão Começar) */}
+                                    {/* O STREAK AGORA MORA AQUI */}
                                     <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-md shadow-[0_0_15px_rgba(234,179,8,0.15)] group-hover:bg-yellow-500/20 transition-all cursor-default" title="Dias seguidos acessando o app">
                                         <Zap className="w-4 h-4 text-yellow-400 fill-yellow-400 animate-pulse" />
                                         <span className="text-xs font-bold text-yellow-100">{streak} Dias</span>
