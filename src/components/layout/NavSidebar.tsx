@@ -36,7 +36,7 @@ export function NavSidebar() {
       collapsible="icon"
     >
       {/* Header com Logo */}
-      <SidebarHeader className="p-4 border-b border-border/30">
+      <SidebarHeader className="p-4 border-b border-white/10">
         <div className="flex items-center gap-3">
           <MoneyPlanLogo size="md" />
           {!isCollapsed && (
