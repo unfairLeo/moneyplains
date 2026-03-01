@@ -98,7 +98,7 @@ export function NavSidebar() {
       </SidebarContent>
 
       {/* Footer com Botão de Colapso */}
-      <SidebarFooter className="p-4 border-t border-border/30">
+      <SidebarFooter className="p-4 border-t border-white/10">
         <Button
           variant="ghost"
           onClick={toggleSidebar}

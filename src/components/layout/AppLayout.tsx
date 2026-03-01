@@ -17,7 +17,7 @@ function AppLayoutContent() {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top Bar */}
-          <header className="h-14 border-b border-border/30 flex items-center px-4 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
+          <header className="h-14 border-b border-white/10 flex items-center px-4 bg-black/30 backdrop-blur-md sticky top-0 z-40">
             {/* Hamburger + Logo - Mobile Only */}
             <div className="flex items-center gap-3 md:hidden">
               <SidebarTrigger className="h-10 w-10" />
