@@ -166,16 +166,30 @@ export function TimeMachineSimulator() {
   return (
     <div className="glass-card p-6 md:p-8 mt-10">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 rounded-xl bg-secondary/20 neon-glow-purple">
-          <Clock className="w-7 h-7 text-secondary" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-secondary/20 neon-glow-purple">
+            <Clock className="w-7 h-7 text-secondary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-display font-bold">A Máquina do Tempo</h2>
+            <p className="text-sm text-muted-foreground">
+              Simule seus investimentos e veja seu futuro
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-display font-bold">A Máquina do Tempo</h2>
-          <p className="text-sm text-muted-foreground">
-            Simule seus investimentos e veja seu futuro
-          </p>
-        </div>
+        <Select value={investmentProfile} onValueChange={handleProfileChange}>
+          <SelectTrigger className="w-[160px] glass-card border-border/50 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(INVESTMENT_PROFILES).map(([key, { label }]) => (
+              <SelectItem key={key} value={key}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Sliders */}
