@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Outlet } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import bgImage from "@/assets/fundompsemimg.png";
 import { NavSidebar } from "./NavSidebar";
 import { ConversationProvider } from "@/contexts/ConversationContext";
 import { SidebarTrigger } from "@/components/ui/sidebar";
