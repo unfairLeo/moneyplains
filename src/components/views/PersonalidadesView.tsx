@@ -38,8 +38,10 @@ export function PersonalidadesView() {
 
       {/* Personas Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {defaultPersonas.map((persona) => (
-          <PersonaCard key={persona.id} persona={persona} />
+        {defaultPersonas.map((persona, index) => (
+          <div key={persona.id} className={`animate-stagger-in stagger-${index + 1}`}>
+            <PersonaCard persona={persona} />
+          </div>
         ))}
       </div>
     </div>
