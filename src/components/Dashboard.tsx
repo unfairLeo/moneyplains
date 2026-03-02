@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { User, Bot, Sparkles, Wallet, TrendingUp, Plus, Minus, ArrowRight, ChevronDown, Zap } from "lucide-react"; 
+import { User, Bot, Sparkles, Wallet, TrendingUp, Plus, Minus, ArrowRight, ChevronDown, Zap } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"; 
 import QueryInput from "./QueryInput";
 import MetricsGrid from "./MetricsGrid";
