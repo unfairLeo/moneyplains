@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { User, Bot, Sparkles, Wallet, TrendingUp, Plus, Minus, ArrowRight, ChevronDown, Zap } from "lucide-react"; 
+import { User, Bot, Sparkles, Wallet, TrendingUp, Plus, Minus, ArrowRight, ChevronDown, Zap } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"; 
 import QueryInput from "./QueryInput";
 import MetricsGrid from "./MetricsGrid";
@@ -198,10 +198,6 @@ const Dashboard = () => {
                         MoneyPlan<span className="text-primary">$</span>
                     </h1>
                 </div>
-                
-                <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
-                    {/* Espaço vazio ou data */}
-                </div>
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
@@ -264,11 +260,11 @@ const Dashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Direita: STREAK + SELECT (Alinhados) */}
+                                {/* Direita: STREAK + SELECT */}
                                 <div className="flex flex-col items-end gap-3">
                                     
-                                    {/* O STREAK AGORA MORA AQUI */}
-                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-md shadow-[0_0_15px_rgba(234,179,8,0.15)] group-hover:bg-yellow-500/20 transition-all cursor-default" title="Dias seguidos acessando o app">
+                                    {/* Streak Badge */}
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-md shadow-[0_0_15px_rgba(234,179,8,0.15)] transition-all cursor-default" title="Dias seguidos acessando o app">
                                         <Zap className="w-4 h-4 text-yellow-400 fill-yellow-400 animate-pulse" />
                                         <span className="text-xs font-bold text-yellow-100">{streak} Dias</span>
                                     </div>

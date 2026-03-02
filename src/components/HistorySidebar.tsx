@@ -82,9 +82,9 @@ const HistorySidebar = ({
       <SheetContent
         side="left"
         // [ALTERAÇÃO AQUI] Troquei bg-background/95 por bg-black/20 para ficar transparente e mostrar a foto de fundo
-        className="w-80 bg-black/20 backdrop-blur-xl border-r border-white/5 p-0 shadow-2xl"
+        className="w-80 bg-black/20 backdrop-blur-md border-none p-0 shadow-2xl"
       >
-        <SheetHeader className="p-6 border-b border-white/10"> {/* [OPCIONAL] Também suavizei a borda do header aqui */}
+        <SheetHeader className="p-6 border-b border-white/5">
           <SheetTitle className="flex items-center gap-3 text-white">
             <div className="p-2 rounded-lg bg-primary/20 neon-glow-emerald">
               <History className="w-5 h-5 text-primary" />
