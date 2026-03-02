@@ -260,11 +260,11 @@ const Dashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Direita: STREAK + SELECT (Alinhados) */}
+                                {/* Direita: STREAK + SELECT */}
                                 <div className="flex flex-col items-end gap-3">
                                     
-                                    {/* O STREAK AGORA MORA AQUI */}
-                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-md shadow-[0_0_15px_rgba(234,179,8,0.15)] group-hover:bg-yellow-500/20 transition-all cursor-default" title="Dias seguidos acessando o app">
+                                    {/* Streak Badge */}
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 backdrop-blur-md shadow-[0_0_15px_rgba(234,179,8,0.15)] transition-all cursor-default" title="Dias seguidos acessando o app">
                                         <Zap className="w-4 h-4 text-yellow-400 fill-yellow-400 animate-pulse" />
                                         <span className="text-xs font-bold text-yellow-100">{streak} Dias</span>
                                     </div>
