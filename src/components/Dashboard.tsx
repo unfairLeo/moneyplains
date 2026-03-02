@@ -233,6 +233,35 @@ const Dashboard = () => {
                                         <TrendingUp className="w-3 h-3" />
                                         <span>+12.5% este mês</span>
                                     </div>
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-3 mt-4">
+                                        <button
+                                          onClick={() => {
+                                            const val = window.prompt("Quanto deseja aportar? (R$)");
+                                            if (val) {
+                                              const num = parseFloat(val.replace(/[^\d.,-]/g, '').replace(',', '.'));
+                                              if (!isNaN(num) && num > 0) setSaldo(prev => prev + num);
+                                            }
+                                          }}
+                                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-[0_0_20px_hsl(160_84%_39%/0.5)] hover:scale-105 active:scale-95 transition-all duration-300"
+                                        >
+                                          <Plus className="w-4 h-4" />
+                                          Aportar
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            const val = window.prompt("Quanto deseja resgatar? (R$)");
+                                            if (val) {
+                                              const num = parseFloat(val.replace(/[^\d.,-]/g, '').replace(',', '.'));
+                                              if (!isNaN(num) && num > 0) setSaldo(prev => Math.max(0, prev - num));
+                                            }
+                                          }}
+                                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 text-white font-semibold text-sm hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300"
+                                        >
+                                          <Minus className="w-4 h-4" />
+                                          Resgatar
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Direita: STREAK + SELECT (Alinhados) */}
