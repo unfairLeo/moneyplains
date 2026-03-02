@@ -198,10 +198,6 @@ const Dashboard = () => {
                         MoneyPlan<span className="text-primary">$</span>
                     </h1>
                 </div>
-                
-                <div className="hidden md:flex items-center gap-2 text-xs text-gray-400">
-                    {/* Espaço vazio ou data */}
-                </div>
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
