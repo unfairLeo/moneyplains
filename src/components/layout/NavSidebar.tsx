@@ -57,8 +57,8 @@ export function NavSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             
-            {/* [ALTERAÇÃO AQUI] Adicionei space-y-2 para criar o espaço entre os botões */}
-            <SidebarMenu className="space-y-2">
+            {/* [ALTERAÇÃO AQUI] Mudei para space-y-4 (antes era 2) para separar mais */}
+            <SidebarMenu className="space-y-4">
               
               {mainNavItems.map((item, index) => (
                 <SidebarMenuItem key={item.title} className={`animate-stagger-in stagger-${index + 1}`}>
