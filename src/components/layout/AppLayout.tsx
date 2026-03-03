@@ -6,20 +6,24 @@ import { NavSidebar } from "./NavSidebar";
 import { ConversationProvider } from "@/contexts/ConversationContext";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function AppLayoutContent() {
+  const isMobile = useIsMobile();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        {/* Left Navigation Sidebar */}
         <NavSidebar />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Top Bar */}
-          <header className="h-14 flex items-center px-4 bg-transparent sticky top-0 z-40">
-            {/* Hamburger + Logo - Mobile Only */}
-            <div className="flex items-center gap-3 md:hidden">
+        {/* Main Content - offset for mini sidebar on desktop */}
+        <div
+          className="flex-1 flex flex-col min-w-0"
+          style={!isMobile ? { marginLeft: 72 } : {}}
+        >
+          {/* Top Bar - Mobile Only */}
+          <header className="h-14 flex items-center px-4 bg-transparent sticky top-0 z-40 md:hidden">
+            <div className="flex items-center gap-3">
               <SidebarTrigger className="h-10 w-10" />
               <MoneyPlanLogo size="sm" />
               <span className="text-lg font-bold">
@@ -29,16 +33,12 @@ function AppLayoutContent() {
             </div>
           </header>
 
-          {/* Content */}
           <main className="flex-1 overflow-auto">
-            {/* Background Effects */}
             <img
               src={bgImage}
               alt=""
               className="fixed inset-0 w-full h-full object-cover pointer-events-none z-0"
             />
-
-            {/* Page Content */}
             <div className="relative z-10">
               <Outlet />
             </div>

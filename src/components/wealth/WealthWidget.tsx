@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
+import { NumberTicker } from "@/components/ui/NumberTicker";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -75,18 +77,12 @@ const rangeLabels: { key: TimeRange; label: string }[] = [
   { key: "total", label: "Total" },
 ];
 
-// --- Custom Tooltip ---
 function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
-
   const point = payload[0];
   const value = point.value as number;
   const date = point.payload.date as string;
-
-  const formatted = value.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const formatted = value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div className="glass-card px-3 py-2 border border-border/50 rounded-lg shadow-lg">
@@ -107,30 +103,24 @@ export function WealthWidget({
   const data = dataMap[activeRange];
 
   const isPositiveTrend = data[data.length - 1].value >= data[0].value;
-  const chartColor = isPositiveTrend
-    ? "hsl(160 84% 45%)"
-    : "hsl(0 84% 60%)";
-
-  const formatCurrency = (value: number) =>
-    value.toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+  const chartColor = isPositiveTrend ? "hsl(160 84% 45%)" : "hsl(0 84% 60%)";
 
   return (
-    <div className={cn("glass-card p-5 relative overflow-hidden", className)}>
-      {/* Background glow */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={cn("glass-card p-5 relative overflow-hidden", className)}
+    >
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
 
       <div className="relative">
-        {/* Header row: label + pills */}
+        {/* Header row */}
         <div className="flex items-start justify-between mb-1">
           <p className="text-sm text-muted-foreground flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             Patrimônio Inteligente
           </p>
-
-          {/* Pill filters */}
           <div className="flex gap-1">
             {rangeLabels.map(({ key, label }) => (
               <button
@@ -149,10 +139,10 @@ export function WealthWidget({
           </div>
         </div>
 
-        {/* Value */}
+        {/* Animated Number Ticker */}
         <p className="text-3xl md:text-4xl font-sans font-bold text-foreground tracking-tight mb-4">
           <span className="text-primary text-glow-emerald">R$</span>{" "}
-          <span>{formatCurrency(patrimony)}</span>
+          <NumberTicker value={patrimony} decimals={2} locale="pt-BR" className="tabular-nums" />
         </p>
 
         {/* Area chart */}
@@ -165,25 +155,16 @@ export function WealthWidget({
                   <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis
-                dataKey="date"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "hsl(220 10% 55%)", fontSize: 10 }}
-                interval="preserveStartEnd"
-              />
+              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "hsl(220 10% 55%)", fontSize: 10 }} interval="preserveStartEnd" />
               <YAxis hide domain={["dataMin - 200", "dataMax + 200"]} />
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ stroke: "hsl(160 84% 39%)", strokeWidth: 1, strokeDasharray: "4 4" }}
-              />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "hsl(160 84% 39%)", strokeWidth: 1, strokeDasharray: "4 4" }} />
               <Area
                 type="monotone"
                 dataKey="value"
                 stroke={chartColor}
                 strokeWidth={2.5}
                 fill="url(#patrimonyGradient)"
-                animationDuration={800}
+                animationDuration={1200}
                 animationEasing="ease-in-out"
               />
             </AreaChart>
@@ -192,22 +173,20 @@ export function WealthWidget({
 
         {/* Footer badge */}
         <div className="flex justify-end mt-3">
-          <div
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
             className={cn(
               "px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1",
-              monthlyChange >= 0
-                ? "bg-primary/20 text-primary"
-                : "bg-destructive/20 text-destructive"
+              monthlyChange >= 0 ? "bg-primary/20 text-primary" : "bg-destructive/20 text-destructive"
             )}
           >
-            <span>
-              {monthlyChange >= 0 ? "+" : ""}
-              {monthlyChange}%
-            </span>
+            <span>{monthlyChange >= 0 ? "+" : ""}{monthlyChange}%</span>
             <span className="text-xs text-muted-foreground">este mês</span>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
