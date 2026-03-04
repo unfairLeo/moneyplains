@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { lovable } from "@/integrations/lovable";
+import { supabase } from "@/integrations/supabase/client"; 
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
 import { useToast } from "@/hooks/use-toast";
 import bgImage from "@/assets/fundompsemimg.png";
@@ -42,10 +42,15 @@ export default function Login() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      // @ts-ignore: O VS Code Web não encontra os tipos do Supabase, mas a função existe perfeitamente
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
       });
-      if (result.error) {
+      
+      if (error) {
         toast({
           title: "Erro ao entrar",
           description: "Não foi possível fazer login com o Google.",
@@ -84,7 +89,7 @@ export default function Login() {
             <MoneyPlanLogo size="lg" />
             <h1 className="mt-4 text-2xl font-bold text-foreground">
               <span className="text-primary text-glow-emerald">Money</span>
-              <span>Plan</span>
+              <span>Plan$</span>
             </h1>
             <p className="mt-2 text-muted-foreground text-center text-sm">
               Acesse o seu Patrimônio
