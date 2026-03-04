@@ -16,6 +16,7 @@ import { WealthWidget } from "@/components/wealth/WealthWidget";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export function ChatView() {
+  const { user } = useAuth();
   const [netWorth, setNetWorth] = useState<number | null>(null);
   const [prefillQuery, setPrefillQuery] = useState("");
   const [prefillKey, setPrefillKey] = useState(0);
@@ -30,6 +31,7 @@ export function ChatView() {
     setError,
   } = useConversation();
   const { toast } = useToast();
+  const firstName = user?.user_metadata?.full_name?.split(" ")[0] ?? "Usuário";
 
   const handleSmartAction = (text: string) => {
     setPrefillQuery(text);
