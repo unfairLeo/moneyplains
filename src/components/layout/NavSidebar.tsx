@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Home, Target, Rocket, Users, Trophy, History } from "lucide-react";
+import { MessageSquare, Target, Rocket, UserCircle, Trophy, History } from "lucide-react"; // Ícones atualizados
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
 import { NavLink } from "@/components/NavLink";
 import { HistoryDrawer } from "./HistoryDrawer";
@@ -20,10 +20,10 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainNavItems = [
-  { title: "Chat", path: "/", icon: Home },
+  { title: "Chat", path: "/", icon: MessageSquare }, // Mudou de Home para MessageSquare
   { title: "Metas", path: "/metas", icon: Target },
   { title: "Missões", path: "/missoes", icon: Rocket },
-  { title: "Personalidades", path: "/personalidades", icon: Users },
+  { title: "Personalidades", path: "/personalidades", icon: UserCircle }, // Mudou de Users para UserCircle
   { title: "Conquistas", path: "/conquistas", icon: Trophy },
 ];
 
@@ -46,8 +46,8 @@ export function NavSidebar() {
         onMouseLeave={() => !isMobile && setIsHovered(false)}
         className={[
           "h-full flex flex-col overflow-hidden",
-          // Glassmorphism background
-          "bg-slate-950/80 backdrop-blur-md border-r border-slate-800",
+          // Glassmorphism Premium Purple Background
+          "bg-[#0f0c1b]/95 backdrop-blur-md border-r border-purple-900/30 shadow-[4px_0_24px_rgba(0,0,0,0.3)]",
           // Width transition
           "transition-all duration-300 ease-in-out",
           expanded ? "w-64" : "w-16",
@@ -70,8 +70,8 @@ export function NavSidebar() {
               }`}
             >
               <h1 className="text-base font-sans font-bold tracking-tight">
-                <span className="text-emerald-400">Money</span>
-                <span className="text-slate-100">Plan</span>
+                <span className="text-purple-400">Money</span> {/* Verde mudou para Roxo */}
+                <span className="text-slate-100">Plan$</span>
               </h1>
             </div>
           </div>
@@ -85,7 +85,7 @@ export function NavSidebar() {
               expanded ? "opacity-60 max-h-8 mb-2 px-3" : "opacity-0 max-h-0 mb-0"
             }`}
           >
-            <span className="text-[10px] uppercase tracking-[0.15em] text-slate-500 font-semibold">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-purple-300/60 font-semibold">
               Menu
             </span>
           </div>
@@ -108,20 +108,26 @@ export function NavSidebar() {
                           tooltip={item.title}
                           onClick={() => sidebarMobile && setOpenMobile(false)}
                           className={[
-                            "flex flex-row items-center gap-3 rounded-lg transition-all duration-200",
+                            // 'relative' adicionado para permitir o indicador lateral neon
+                            "relative flex flex-row items-center gap-3 rounded-lg transition-all duration-200", 
                             expanded ? "px-3 py-2.5" : "justify-center px-0 py-2.5",
                             isActive
-                              ? "bg-emerald-500/10 text-emerald-400"
-                              : "text-slate-400 hover:text-slate-100 hover:bg-white/5",
+                              ? "bg-purple-500/10 text-purple-400" // Fundo suave e texto roxo se ativo
+                              : "text-purple-200/40 hover:text-purple-200 hover:bg-white/5", // Cinza fosco se inativo
                           ].join(" ")}
                           activeClassName=""
                         >
+                          {/* Indicador de borda neon roxa quando ativo */}
+                          {isActive && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-purple-500 rounded-r-full shadow-[0_0_12px_rgba(168,85,247,0.8)]" />
+                          )}
+                          
                           <item.icon
                             size={20}
-                            strokeWidth={1.5}
+                            strokeWidth={isActive ? 2 : 1.5} // Ícone fica um pouco mais grosso quando selecionado
                             className={`flex-shrink-0 transition-all duration-200 ${
                               isActive
-                                ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                                ? "text-purple-400 drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]" // Efeito de brilho
                                 : ""
                             }`}
                           />
@@ -130,7 +136,7 @@ export function NavSidebar() {
                               expanded
                                 ? "opacity-100 max-w-[160px]"
                                 : "opacity-0 max-w-0"
-                            } ${isActive ? "text-emerald-400" : ""}`}
+                            } ${isActive ? "text-purple-400" : ""}`}
                           >
                             {item.title}
                           </span>
@@ -143,7 +149,7 @@ export function NavSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          <SidebarSeparator className="my-3 bg-slate-800/60" />
+          <SidebarSeparator className="my-3 bg-purple-900/30" />
 
           {/* History Drawer */}
           <SidebarGroup>
@@ -160,7 +166,7 @@ export function NavSidebar() {
         </SidebarContent>
 
         {/* Bottom glow */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-emerald-500/[0.03] to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-purple-500/[0.05] to-transparent pointer-events-none" />
       </div>
     </Sidebar>
   );
