@@ -10,11 +10,13 @@ import { useConversation } from "@/contexts/ConversationContext";
 import { useToast } from "@/hooks/use-toast";
 import { BackendResponse, transformBackendResponse } from "@/types/api";
 import { validateQuery, isApiConfigured, getApiUrl, getFetchTimeout } from "@/lib/api";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { WealthWidget } from "@/components/wealth/WealthWidget";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export function ChatView() {
+  const { user } = useAuth();
   const [netWorth, setNetWorth] = useState<number | null>(null);
   const [prefillQuery, setPrefillQuery] = useState("");
   const [prefillKey, setPrefillKey] = useState(0);
@@ -29,6 +31,7 @@ export function ChatView() {
     setError,
   } = useConversation();
   const { toast } = useToast();
+  const firstName = user?.user_metadata?.full_name?.split(" ")[0] ?? "Usuário";
 
   const handleSmartAction = (text: string) => {
     setPrefillQuery(text);
@@ -149,20 +152,18 @@ export function ChatView() {
       <header className="flex items-center justify-between mb-10">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            Olá, Usuário 👋
+            Olá, {firstName} 👋
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Aqui está o resumo do seu patrimônio
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-200">
+          <button className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200">
             <Bell size={20} strokeWidth={1.5} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
           </button>
-          <Avatar className="h-9 w-9 border border-slate-700">
-            <AvatarFallback className="bg-slate-800 text-slate-300 text-sm">U</AvatarFallback>
-          </Avatar>
+          <UserMenu />
         </div>
       </header>
 
