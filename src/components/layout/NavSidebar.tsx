@@ -45,7 +45,7 @@ export function NavSidebar() {
         onMouseLeave={() => !isMobile && setIsHovered(false)}
         className={[
           "h-full flex flex-col overflow-hidden",
-          // Fundo dark neutro, sem tons de roxo
+          // Fundo dark neutro para destacar apenas o roxo do botão ativo
           "bg-slate-950/90 backdrop-blur-md border-r border-slate-800 shadow-xl",
           "transition-all duration-300 ease-in-out",
           expanded ? "w-64" : "w-16",
@@ -68,8 +68,8 @@ export function NavSidebar() {
               }`}
             >
               <h1 className="text-base font-sans font-bold tracking-tight">
-                <span className="text-white">Money</span>
-                <span className="text-slate-400">Plan$</span>
+                <span className="text-purple-400">Money</span>
+                <span className="text-slate-100">Plan$</span>
               </h1>
             </div>
           </div>
@@ -109,21 +109,23 @@ export function NavSidebar() {
                             "relative flex flex-row items-center gap-3 rounded-lg transition-all duration-200", 
                             expanded ? "px-3 py-2.5" : "justify-center px-0 py-2.5",
                             isActive
-                              ? "bg-white/10 text-white" // Branco puro e fundo sutil quando ativo
-                              : "text-slate-400 hover:text-slate-200 hover:bg-white/5", // Cinza quando inativo
+                              ? "bg-purple-500/10 text-purple-400" // Roxo premium quando a aba está aberta
+                              : "text-slate-400 hover:text-slate-100 hover:bg-white/5", // Cinza minimalista quando inativo
                           ].join(" ")}
                           activeClassName=""
                         >
-                          {/* Indicador lateral branco bem discreto */}
+                          {/* Indicador lateral neon roxo de volta! */}
                           {isActive && (
-                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-white rounded-r-full shadow-[0_0_8px_rgba(255,255,255,0.2)]" />
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-purple-500 rounded-r-full shadow-[0_0_12px_rgba(168,85,247,0.8)]" />
                           )}
                           
                           <item.icon
                             size={20}
-                            strokeWidth={1.5} // Traço fino e elegante
+                            strokeWidth={isActive ? 2 : 1.5}
                             className={`flex-shrink-0 transition-all duration-200 ${
-                              isActive ? "text-white" : ""
+                              isActive
+                                ? "text-purple-400 drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]" // Brilho roxo no ícone
+                                : "" // Ícone normal e fino se inativo
                             }`}
                           />
                           <span
@@ -131,7 +133,7 @@ export function NavSidebar() {
                               expanded
                                 ? "opacity-100 max-w-[160px]"
                                 : "opacity-0 max-w-0"
-                            } ${isActive ? "text-white" : ""}`}
+                            } ${isActive ? "text-purple-400" : ""}`}
                           >
                             {item.title}
                           </span>
