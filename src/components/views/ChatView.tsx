@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Bell } from "lucide-react";
 import QueryInput from "@/components/QueryInput";
 import ChartDisplay from "@/components/ChartDisplay";
 import MetricsGrid from "@/components/MetricsGrid";
@@ -10,7 +10,7 @@ import { useConversation } from "@/contexts/ConversationContext";
 import { useToast } from "@/hooks/use-toast";
 import { BackendResponse, transformBackendResponse } from "@/types/api";
 import { validateQuery, isApiConfigured, getApiUrl, getFetchTimeout } from "@/lib/api";
-import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { WealthWidget } from "@/components/wealth/WealthWidget";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
