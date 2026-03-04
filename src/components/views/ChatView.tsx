@@ -10,7 +10,8 @@ import { useConversation } from "@/contexts/ConversationContext";
 import { useToast } from "@/hooks/use-toast";
 import { BackendResponse, transformBackendResponse } from "@/types/api";
 import { validateQuery, isApiConfigured, getApiUrl, getFetchTimeout } from "@/lib/api";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { WealthWidget } from "@/components/wealth/WealthWidget";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
