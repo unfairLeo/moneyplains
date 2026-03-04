@@ -146,15 +146,24 @@ export function ChatView() {
     <TooltipProvider>
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
-      <header className="text-center mb-12">
-        <div className="inline-flex items-center gap-3 mb-4">
-          <MoneyPlanLogo size="lg" />
-          <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tight">
-            <span className="text-primary text-glow-emerald">Money</span>
-            <span className="text-foreground">Plan</span>
+      <header className="flex items-center justify-between mb-10">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            Olá, Usuário 👋
           </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Aqui está o resumo do seu patrimônio
+          </p>
         </div>
-        <p className="text-muted-foreground text-lg">Gestão de Patrimônio Inteligente</p>
+        <div className="flex items-center gap-3">
+          <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-200">
+            <Bell size={20} strokeWidth={1.5} />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
+          </button>
+          <Avatar className="h-9 w-9 border border-slate-700">
+            <AvatarFallback className="bg-slate-800 text-slate-300 text-sm">U</AvatarFallback>
+          </Avatar>
+        </div>
       </header>
 
       {/* Wealth + Streak Row */}
