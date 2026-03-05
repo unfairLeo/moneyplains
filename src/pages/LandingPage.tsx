@@ -56,8 +56,11 @@ function MiniChart() {
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Interactive particle background */}
+      <ParticleBackground />
+
       {/* Ambient glow effects */}
-      <div className="fixed inset-0 pointer-events-none">
+      <div className="fixed inset-0 pointer-events-none z-[1]">
         <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px]" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-secondary/8 blur-[100px]" />
       </div>
