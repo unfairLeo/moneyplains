@@ -169,7 +169,7 @@ export default function LandingPage() {
             {/* Coins floating badge */}
             <FloatingCard className="absolute z-10 top-[0%] right-[10%] md:right-[15%] !p-3" delay={0.7}>
               <div className="flex items-center gap-2">
-                <Coins size={20} className="text-yellow-400" />
+                <Coins size={20} className="text-tier-gold" />
                 <span className="text-sm font-medium text-foreground">+R$ 1.200</span>
               </div>
             </FloatingCard>
