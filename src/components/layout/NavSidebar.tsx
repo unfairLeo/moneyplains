@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainNavItems = [
-  { title: "Chat", path: "/", icon: MessageSquare },
+  { title: "Chat", path: "/dashboard", icon: MessageSquare },
   { title: "Metas", path: "/metas", icon: Target },
   { title: "Missões", path: "/missoes", icon: Rocket },
   { title: "Personalidades", path: "/personalidades", icon: UserCircle },
