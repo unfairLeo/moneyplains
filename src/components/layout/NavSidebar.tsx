@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainNavItems = [
-  { title: "Chat", path: "/", icon: MessageSquare },
+  { title: "Chat", path: "/dashboard", icon: MessageSquare },
   { title: "Metas", path: "/metas", icon: Target },
   { title: "Missões", path: "/missoes", icon: Rocket },
   { title: "Personalidades", path: "/personalidades", icon: UserCircle },
@@ -94,8 +94,8 @@ export function NavSidebar() {
               <SidebarMenu className="space-y-1">
                 {mainNavItems.map((item) => {
                   const isActive =
-                    item.path === "/"
-                      ? location.pathname === "/"
+                    item.path === "/dashboard"
+                      ? location.pathname === "/dashboard"
                       : location.pathname.startsWith(item.path);
 
                   return (
@@ -103,7 +103,7 @@ export function NavSidebar() {
                       <SidebarMenuButton asChild size="lg" className="hover:bg-transparent p-0">
                         <NavLink
                           to={item.path}
-                          end={item.path === "/"}
+                          end={item.path === "/dashboard"}
                           tooltip={item.title}
                           onClick={() => sidebarMobile && setOpenMobile(false)}
                           className={[

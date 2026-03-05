@@ -25,7 +25,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route
               element={
@@ -34,7 +34,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route path="/" element={<ChatView />} />
+              <Route path="/dashboard" element={<ChatView />} />
               <Route path="/metas" element={<MetasView />} />
               <Route path="/missoes" element={<MissoesView />} />
               <Route path="/personalidades" element={<PersonalidadesView />} />
