@@ -1,6 +1,7 @@
 import { Bot, Coins, TrendingUp, Wallet, Shield, PiggyBank, ArrowRight, Sparkles, BarChart3, Lock, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ParticleBackground } from "@/components/landing/ParticleBackground";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
