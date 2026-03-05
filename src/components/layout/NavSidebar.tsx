@@ -103,7 +103,7 @@ export function NavSidebar() {
                       <SidebarMenuButton asChild size="lg" className="hover:bg-transparent p-0">
                         <NavLink
                           to={item.path}
-                          end={item.path === "/"}
+                          end={item.path === "/dashboard"}
                           tooltip={item.title}
                           onClick={() => sidebarMobile && setOpenMobile(false)}
                           className={[
