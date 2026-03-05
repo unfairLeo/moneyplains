@@ -94,8 +94,8 @@ export function NavSidebar() {
               <SidebarMenu className="space-y-1">
                 {mainNavItems.map((item) => {
                   const isActive =
-                    item.path === "/"
-                      ? location.pathname === "/"
+                    item.path === "/dashboard"
+                      ? location.pathname === "/dashboard"
                       : location.pathname.startsWith(item.path);
 
                   return (
