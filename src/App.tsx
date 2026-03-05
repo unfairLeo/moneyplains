@@ -12,6 +12,7 @@ import { MissoesView } from "@/components/views/MissoesView";
 import { PersonalidadesView } from "@/components/views/PersonalidadesView";
 import { ConquistasView } from "@/components/views/ConquistasView";
 import Login from "@/pages/Login";
+import LandingPage from "@/pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route
               element={
