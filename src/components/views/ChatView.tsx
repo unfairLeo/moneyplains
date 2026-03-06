@@ -168,12 +168,9 @@ export function ChatView() {
         </div>
       </header>
 
-      {/* Wealth + Streak Row */}
-      <div className="flex items-center gap-4 mb-6 animate-stagger-in stagger-1">
-        <div className="flex-1">
-          <WealthWidget patrimony={netWorth ?? undefined} />
-        </div>
-        <StreakBadge />
+      {/* Wealth Widget */}
+      <div className="mb-6 animate-stagger-in stagger-1">
+        <WealthWidget patrimony={netWorth ?? undefined} />
       </div>
 
       {/* Smart Actions */}
