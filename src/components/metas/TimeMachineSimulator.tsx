@@ -34,10 +34,6 @@ const INVESTMENT_PROFILES: Record<string, { label: string; rate: number }> = {
     label: "Fundos Imobiliários", 
     rate: 0.12 // 12% ao ano
   },
-  acoes: { 
-    label: "Ações (Bolsa)", 
-    rate: 0.15 // 15% (Média estimada para não quebrar o gráfico)
-  },
 };
 
 function calculateCompoundInterest(
