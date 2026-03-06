@@ -1,131 +1,36 @@
 
 
-## Ajuste da Integracao com o Webhook n8n
+## Plan: Aurora Background Effect + Streak Repositioning
 
-### Problema Atual
+### 1. Aurora/Mesh Gradient Background on Landing Page
 
-O frontend espera um `ApiResponse` com campos `{ title, metrics, charts, conversation }`, mas o backend envia:
+Add animated aurora blobs to `src/pages/LandingPage.tsx` — three large, blurred (`blur-3xl`) green-neon circles with very low opacity (10-15%) that move slowly and continuously using Framer Motion's `animate` with infinite repeat.
 
-```text
-{
-  "resposta": "Texto da conversa",
-  "intencao": "grafico" | "conversa",
-  "variaveis_matematicas": { "net_worth": 1000, ... },
-  "labels": ["Jan", "Fev", ...],
-  "valores": [100, 200, ...]
-}
-```
+These will be placed as `fixed` divs behind all content (z-0), replacing the current static ambient glow `div`s (lines ~67-71). The particle canvas stays on top of these blobs.
 
-Resultado: os dados chegam mas nenhum campo e mapeado corretamente -- o chat nao exibe a resposta, os graficos nao renderizam e o patrimonio permanece estatico.
+Each blob will have a different animation path (translating x/y over 15-25s cycles) to create organic, non-repetitive movement.
 
----
+### 2. Streak Badge Placement on Landing Page
 
-### Solucao: Camada de Transformacao + Estado Global de Patrimonio
+The StreakBadge currently only appears in `ChatView.tsx` (the dashboard). The user wants it placed "strategically" on the landing page as well.
 
-#### 1. Novo tipo `BackendResponse` (api.ts)
+Since the landing page is public (pre-auth), and the StreakBadge depends on `useConversation` context (which requires auth), we have two options:
+- Place the streak in the navbar of the landing page (visible only as a decorative/motivational element)
+- Better approach: move the StreakBadge to a more prominent position within the dashboard's ChatView, since it needs auth context
 
-Criar a interface que representa exatamente o que o n8n envia, e uma funcao `transformBackendResponse` que converte para o `ApiResponse` que o frontend ja consome.
+Given the StreakBadge requires conversation history (auth-dependent), the strategic move is to reposition it within the **dashboard** — placing it in the header row next to the user greeting and notification bell, rather than beside the WealthWidget where it currently sits. This gives it more visibility.
 
-Mapeamento:
-- `resposta` -> `conversation` (texto do assistente)
-- `intencao === "grafico"` -> gera um `ChartItem` do tipo `bar` usando `labels` como `name` e `valores` como `value`
-- `variaveis_matematicas.net_worth` -> extraido e retornado separadamente para atualizar o WealthWidget
-- `titulo` (se vier vazio, gerar titulo automatico baseado na intencao)
+### Changes
 
-#### 2. Modificar ChatView.tsx
+**`src/pages/LandingPage.tsx`:**
+- Replace the static ambient glow divs (lines 67-71) with three `motion.div` aurora blobs:
+  - Blob 1: top-left, `bg-primary/10`, `blur-3xl`, slow diagonal drift (20s loop)
+  - Blob 2: bottom-right, `bg-primary/[0.08]`, `blur-3xl`, circular drift (25s loop)
+  - Blob 3: center, `bg-emerald-500/[0.06]`, `blur-3xl`, vertical drift (18s loop)
+- All blobs: `fixed`, `pointer-events-none`, `z-[1]`, `w-[500-600px]`, `h-[500-600px]`, `rounded-full`
+- Use `framer-motion` `animate` with `x`/`y` keyframes and `repeat: Infinity`, `repeatType: "mirror"`
 
-Na funcao `handleQuery`, apos parsear o JSON:
-- Chamar `transformBackendResponse(rawData)` ao inves de fazer cast direto para `ApiResponse`
-- Adicionar `console.log` com label claro em cada etapa: raw response, dados transformados, erros
-- Se `net_worth` vier na resposta, atualizar um novo estado `netWorth` que sera passado como prop para o `WealthWidget`
-
-#### 3. Modificar WealthWidget.tsx
-
-O componente ja aceita `patrimony` como prop (default 12450). Basta o `ChatView` passar o valor real quando disponivel. Nenhuma mudanca estrutural no widget -- apenas receber o valor atualizado.
-
----
-
-### Resumo dos Arquivos
-
-| Arquivo | Acao |
-|---------|------|
-| `src/types/api.ts` | **Modificar** - Adicionar `BackendResponse` e funcao `transformBackendResponse` |
-| `src/components/views/ChatView.tsx` | **Modificar** - Usar transformacao, estado de patrimonio, console.logs de debug |
-| `src/components/wealth/WealthWidget.tsx` | **Nenhuma mudanca** - Ja aceita `patrimony` como prop |
-
----
-
-### Detalhes Tecnicos
-
-#### api.ts - Novo Tipo e Transformacao
-
-```text
-Interface BackendResponse:
-  resposta: string
-  intencao: "grafico" | "conversa"
-  titulo?: string
-  tipo_grafico?: string
-  variaveis_matematicas?: {
-    net_worth?: number
-    renda_mensal?: number
-    gasto_mensal?: number
-    sobra_mensal?: number
-    meta_total?: number
-  }
-  labels?: string[]
-  valores?: number[]
-
-Funcao transformBackendResponse(raw: BackendResponse):
-  retorna { apiResponse: ApiResponse, netWorth: number | null }
-
-  Logica:
-  1. conversation = raw.resposta || undefined
-  2. title = raw.titulo || (raw.intencao === "grafico" ? "Analise Financeira" : undefined)
-  3. Se intencao === "grafico" E labels/valores existem e tem length > 0:
-     - Montar ChartItem com type = (raw.tipo_grafico || "bar")
-     - data = labels.map((label, i) => ({ name: label, value: valores[i] || 0 }))
-     - charts = [chartItem]
-  4. Se variaveis_matematicas existem e tem valores > 0:
-     - Montar MetricItem[] com renda, gasto, sobra (apenas os que forem > 0)
-  5. netWorth = raw.variaveis_matematicas?.net_worth ?? null
-```
-
-#### ChatView.tsx - Mudancas
-
-```text
-Novos estados:
-  const [netWorth, setNetWorth] = useState<number | null>(null)
-
-Na funcao handleQuery, apos JSON.parse:
-  console.log("[MoneyPlan] Raw API response:", rawData)
-
-  const { apiResponse, netWorth: newNetWorth } = transformBackendResponse(rawData)
-
-  console.log("[MoneyPlan] Transformed response:", apiResponse)
-  console.log("[MoneyPlan] Net worth:", newNetWorth)
-
-  setResponse(apiResponse)
-
-  if (newNetWorth !== null) {
-    setNetWorth(newNetWorth)
-  }
-
-  saveConversation(query, apiResponse)
-
-No bloco de catch:
-  console.error("[MoneyPlan] API Error:", err)
-
-No JSX, passar netWorth para WealthWidget:
-  <WealthWidget patrimony={netWorth ?? undefined} />
-```
-
-#### Console.log Strategy
-
-Logs com prefixo `[MoneyPlan]` em 4 pontos criticos:
-1. `[MoneyPlan] Raw API response:` - JSON bruto recebido do n8n
-2. `[MoneyPlan] Transformed response:` - ApiResponse apos transformacao
-3. `[MoneyPlan] Net worth:` - Valor extraido do net_worth
-4. `[MoneyPlan] API Error:` - Qualquer erro durante o fetch/parse
-
-Isso permite abrir o console do navegador e filtrar por "[MoneyPlan]" para ver exatamente o que esta chegando e como esta sendo transformado.
+**`src/components/views/ChatView.tsx`:**
+- Move `StreakBadge` from the Wealth row (line 175) into the header (line 161 area), placing it between the bell icon and `UserMenu` for maximum visibility
+- Remove the standalone streak from the wealth row
 
