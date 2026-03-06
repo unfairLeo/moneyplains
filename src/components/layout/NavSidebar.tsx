@@ -25,6 +25,7 @@ const mainNavItems = [
   { title: "Missões", path: "/missoes", icon: Rocket },
   { title: "Personalidades", path: "/personalidades", icon: UserCircle },
   { title: "Conquistas", path: "/conquistas", icon: Trophy },
+  { title: "Configurações", path: "/configuracoes", icon: Settings },
 ];
 
 export function NavSidebar() {
