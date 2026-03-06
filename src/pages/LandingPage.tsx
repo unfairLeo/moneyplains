@@ -59,11 +59,22 @@ export default function LandingPage() {
       {/* Interactive particle background */}
       <ParticleBackground />
 
-      {/* Ambient glow effects */}
-      <div className="fixed inset-0 pointer-events-none z-[1]">
-        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-secondary/8 blur-[100px]" />
-      </div>
+      {/* Aurora animated glow blobs */}
+      <motion.div
+        className="fixed top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-primary/10 blur-[180px] pointer-events-none z-[1]"
+        animate={{ x: [0, 80, -40, 0], y: [0, 60, -30, 0] }}
+        transition={{ duration: 20, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+      />
+      <motion.div
+        className="fixed bottom-[-15%] right-[-5%] w-[550px] h-[550px] rounded-full bg-primary/[0.08] blur-[160px] pointer-events-none z-[1]"
+        animate={{ x: [0, -60, 50, 0], y: [0, -80, 40, 0] }}
+        transition={{ duration: 25, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+      />
+      <motion.div
+        className="fixed top-[30%] left-[40%] w-[500px] h-[500px] rounded-full bg-emerald-500/[0.06] blur-[200px] pointer-events-none z-[1]"
+        animate={{ x: [0, 40, -60, 0], y: [0, -50, 70, 0] }}
+        transition={{ duration: 18, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+      />
 
       {/* Navbar */}
       <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-5 border-b border-white/5">

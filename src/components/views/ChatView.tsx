@@ -159,6 +159,7 @@ export function ChatView() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <StreakBadge />
           <button className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200">
             <Bell size={20} strokeWidth={1.5} />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
@@ -167,12 +168,9 @@ export function ChatView() {
         </div>
       </header>
 
-      {/* Wealth + Streak Row */}
-      <div className="flex items-center gap-4 mb-6 animate-stagger-in stagger-1">
-        <div className="flex-1">
-          <WealthWidget patrimony={netWorth ?? undefined} />
-        </div>
-        <StreakBadge />
+      {/* Wealth Widget */}
+      <div className="mb-6 animate-stagger-in stagger-1">
+        <WealthWidget patrimony={netWorth ?? undefined} />
       </div>
 
       {/* Smart Actions */}
