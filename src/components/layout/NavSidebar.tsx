@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { MessageSquare, Target, Rocket, UserCircle, Trophy, History } from "lucide-react";
+import { MessageSquare, Target, Rocket, UserCircle, Trophy, History, Settings } from "lucide-react";
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
 import { NavLink } from "@/components/NavLink";
 import { HistoryDrawer } from "./HistoryDrawer";
