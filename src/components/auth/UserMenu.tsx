@@ -48,7 +48,10 @@ export function UserMenu() {
           <User size={16} strokeWidth={1.5} />
           Meu Perfil
         </DropdownMenuItem>
-        <DropdownMenuItem className="gap-2 text-slate-300 focus:text-foreground focus:bg-white/5 cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => navigate("/configuracoes")}
+          className="gap-2 text-slate-300 focus:text-foreground focus:bg-white/5 cursor-pointer"
+        >
           <Settings size={16} strokeWidth={1.5} />
           Configurações
         </DropdownMenuItem>
