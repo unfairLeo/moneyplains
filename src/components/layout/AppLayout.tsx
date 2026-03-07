@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Outlet } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { NeuralNetworkBackground } from "@/components/background/NeuralNetworkBackground";
+import bgImage from "@/assets/fundompsemimg.png";
 import { NavSidebar } from "./NavSidebar";
 import { ConversationProvider } from "@/contexts/ConversationContext";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -34,7 +34,11 @@ function AppLayoutContent() {
           </header>
 
           <main className="flex-1 overflow-auto">
-            <NeuralNetworkBackground />
+            <img
+              src={bgImage}
+              alt=""
+              className="fixed inset-0 w-full h-full object-cover pointer-events-none z-0"
+            />
             <div className="relative z-10">
               <Outlet />
             </div>
