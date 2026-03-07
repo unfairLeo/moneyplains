@@ -6,7 +6,8 @@ import MetricsGrid from "./MetricsGrid";
 import HistorySidebar from "./HistorySidebar";
 import { useToast } from "@/hooks/use-toast";
 import { useConversationHistory } from "@/hooks/useConversationHistory";
-import { validateQuery, isApiConfigured, getApiUrl, getFetchTimeout } from "@/lib/api";
+import { validateQuery, getFetchTimeout } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
 
 type ChatMessage = {
