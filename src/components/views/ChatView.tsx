@@ -9,7 +9,8 @@ import StreakBadge from "@/components/StreakBadge";
 import { useConversation } from "@/contexts/ConversationContext";
 import { useToast } from "@/hooks/use-toast";
 import { BackendResponse, transformBackendResponse } from "@/types/api";
-import { validateQuery, isApiConfigured, getApiUrl, getFetchTimeout } from "@/lib/api";
+import { validateQuery, getFetchTimeout } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { WealthWidget } from "@/components/wealth/WealthWidget";
@@ -39,7 +40,6 @@ export function ChatView() {
   };
 
   const handleQuery = async (query: string) => {
-    // Validate query before proceeding
     const validation = validateQuery(query);
     if (validation.success === false) {
       setError(validation.error);
@@ -52,58 +52,34 @@ export function ChatView() {
     }
     const validatedQuery = validation.data;
 
-    // Check if API is configured
-    if (!isApiConfigured()) {
-      setError("API não configurada. Configure a variável de ambiente VITE_N8N_WEBHOOK_URL.");
-      toast({
-        title: "Erro de configuração",
-        description: "A URL da API não foi configurada.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
     setResponse(null);
     clearSelection();
 
-    // Create abort controller for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), getFetchTimeout());
 
     try {
-      const res = await fetch(getApiUrl(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query: validatedQuery }),
-        signal: controller.signal,
+      const { data: rawData, error: fnError } = await supabase.functions.invoke('n8n-proxy', {
+        body: { query: validatedQuery },
       });
 
       clearTimeout(timeoutId);
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Erro na API: ${res.status} - ${errorText}`);
+      if (fnError) {
+        throw new Error("server_error");
       }
 
-      const rawText = await res.text();
-
-      let rawData: unknown;
-      try {
-        rawData = JSON.parse(rawText);
-      } catch {
-        throw new Error("Resposta inválida do servidor (não é JSON válido)");
+      if (rawData?.error) {
+        throw new Error(rawData.error);
       }
 
-      console.log("[MoneyPlan] Raw API response:", rawData);
+      if (import.meta.env.DEV) {
+        console.log("[MoneyPlan] API response:", rawData);
+      }
 
       const { apiResponse, netWorth: newNetWorth } = transformBackendResponse(rawData as BackendResponse);
-
-      console.log("[MoneyPlan] Transformed response:", apiResponse);
-      console.log("[MoneyPlan] Net worth:", newNetWorth);
 
       setResponse(apiResponse);
 
@@ -111,22 +87,24 @@ export function ChatView() {
         setNetWorth(newNetWorth);
       }
 
-      // Save conversation to history
       saveConversation(query, apiResponse);
     } catch (err) {
-      console.error("[MoneyPlan] API Error:", err);
-      let message = "Erro ao consultar a API";
+      if (import.meta.env.DEV) {
+        console.error("[MoneyPlan] API Error:", err);
+      }
+
+      let message = "Erro ao processar a solicitação. Tente novamente.";
 
       if (err instanceof Error) {
         if (err.name === "AbortError") {
-          message = `Timeout: o servidor não respondeu a tempo.`;
+          message = "Tempo limite excedido. Tente novamente.";
         } else if (
           err.message.includes("Failed to fetch") ||
           err.message.includes("NetworkError")
         ) {
           message = "Erro de rede. Verifique sua conexão.";
-        } else {
-          message = err.message;
+        } else if (err.message === "server_error") {
+          message = "Erro no servidor. Tente novamente mais tarde.";
         }
       }
 
@@ -217,7 +195,6 @@ export function ChatView() {
         {hasContent &&
           !isLoading &&
           (() => {
-            // Check if there are charts with valid data
             const hasValidCharts =
               response?.charts?.some(
                 (chart) =>
@@ -226,7 +203,6 @@ export function ChatView() {
 
             return (
               <>
-                {/* Title */}
                 {response.title && (
                   <div className="text-center animate-slide-up">
                     <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">
@@ -235,15 +211,12 @@ export function ChatView() {
                   </div>
                 )}
 
-                {/* Conversation - Assistant Text */}
                 {response.conversation && <ConversationCard text={response.conversation} />}
 
-                {/* Metrics Grid - Only appears if there are valid charts */}
                 {hasValidCharts && response.metrics && response.metrics.length > 0 && (
                   <MetricsGrid metrics={response.metrics} />
                 )}
 
-                {/* Charts */}
                 {response.charts && response.charts.length > 0 && (
                   <ChartDisplay charts={response.charts} />
                 )}
