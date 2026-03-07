@@ -34,11 +34,7 @@ function AppLayoutContent() {
           </header>
 
           <main className="flex-1 overflow-auto">
-            <img
-              src={bgImage}
-              alt=""
-              className="fixed inset-0 w-full h-full object-cover pointer-events-none z-0"
-            />
+            <NeuralNetworkBackground />
             <div className="relative z-10">
               <Outlet />
             </div>
