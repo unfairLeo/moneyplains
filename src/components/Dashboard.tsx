@@ -89,31 +89,17 @@ const Dashboard = () => {
       return;
     }
     
-    if (!isApiConfigured()) { setError("API não configurada."); return; }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), getFetchTimeout());
-
-      const payload = { 
-          query: validation.data,
-          context: { investmentType } 
-      };
-
-      const res = await fetch(getApiUrl(), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller.signal
+      const { data: raw, error: fnError } = await supabase.functions.invoke('n8n-proxy', {
+        body: { query: validation.data },
       });
-      clearTimeout(timeoutId);
 
-      if (!res.ok) throw new Error(`Erro na API: ${res.status}`);
-
-      const raw = await res.json();
+      if (fnError || raw?.error) {
+        throw new Error("Erro ao processar a solicitação.");
+      }
       
       if (raw.net_worth !== undefined) {
           const cleanVal = parseFloat(String(raw.net_worth).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
