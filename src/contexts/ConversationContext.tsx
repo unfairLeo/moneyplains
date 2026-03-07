@@ -1,30 +1,43 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { SavedConversation, ApiResponse } from "@/types/api";
 
- const NEW_STORAGE_KEY = "moneyplan_conversation_history";
- const OLD_STORAGE_KEY = "frivacs_conversation_history";
- // Migration helper
- function migrateConversationData(): SavedConversation[] {
-   try {
-     const oldData = localStorage.getItem(OLD_STORAGE_KEY);
-     if (oldData) {
-       localStorage.setItem(NEW_STORAGE_KEY, oldData);
-       localStorage.removeItem(OLD_STORAGE_KEY);
-       const parsed = JSON.parse(oldData);
-       return Array.isArray(parsed) ? parsed : [];
-     }
-     const newData = localStorage.getItem(NEW_STORAGE_KEY);
-     if (newData) {
-       const parsed = JSON.parse(newData);
-       return Array.isArray(parsed) ? parsed : [];
-     }
-   } catch (error) {
-     console.error("Erro ao migrar histórico:", error);
-   }
-   return [];
- }
- 
+const STORAGE_KEY = "moneyplan_conversation_history";
 const MAX_HISTORY_ITEMS = 50;
+const EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function loadConversationData(): SavedConversation[] {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    // Filter out expired conversations
+    const now = Date.now();
+    return parsed.filter((c: SavedConversation) => now - c.timestamp < EXPIRATION_MS);
+  } catch {
+    return [];
+  }
+}
+
+function saveToStorage(data: SavedConversation[]) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.error("Erro ao salvar histórico:", error);
+    }
+  }
+}
+
+// Cleanup: remove old localStorage data if it exists (one-time migration)
+function cleanupOldStorage() {
+  try {
+    localStorage.removeItem("moneyplan_conversation_history");
+    localStorage.removeItem("frivacs_conversation_history");
+  } catch {
+    // ignore
+  }
+}
 
 interface ConversationContextType {
   history: SavedConversation[];
@@ -50,9 +63,9 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load from localStorage on mount
   useEffect(() => {
-     setHistory(migrateConversationData());
+    cleanupOldStorage();
+    setHistory(loadConversationData());
   }, []);
 
   const saveConversation = useCallback((query: string, apiResponse: ApiResponse): string => {
@@ -65,11 +78,7 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
 
     setHistory((prev) => {
       const updated = [newConversation, ...prev].slice(0, MAX_HISTORY_ITEMS);
-      try {
-       localStorage.setItem(NEW_STORAGE_KEY, JSON.stringify(updated));
-      } catch (error) {
-        console.error("Erro ao salvar histórico:", error);
-      }
+      saveToStorage(updated);
       return updated;
     });
 
@@ -89,15 +98,10 @@ export function ConversationProvider({ children }: { children: ReactNode }) {
   const deleteConversation = useCallback((id: string) => {
     setHistory((prev) => {
       const updated = prev.filter((conv) => conv.id !== id);
-      try {
-       localStorage.setItem(NEW_STORAGE_KEY, JSON.stringify(updated));
-      } catch (error) {
-        console.error("Erro ao deletar conversa:", error);
-      }
+      saveToStorage(updated);
       return updated;
     });
 
-    // If deleted conversation was selected, clear the screen
     if (selectedId === id) {
       setSelectedId(null);
       setResponse(null);
