@@ -117,6 +117,7 @@ export default function LandingPage() {
             <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible" className="flex flex-wrap gap-4">
               <Link
                 to="/login"
+                state={{ fromLanding: true }}
                 className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-base hover:shadow-[0_0_30px_hsl(160_84%_39%/0.5)] hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 Começar Agora
