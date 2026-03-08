@@ -2,6 +2,7 @@ import { Bot, Coins, TrendingUp, Wallet, Shield, PiggyBank, ArrowRight, Sparkles
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ParticleBackground } from "@/components/landing/ParticleBackground";
+import { AuroraBackground } from "@/components/landing/AuroraBackground";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
