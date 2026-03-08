@@ -1,121 +1,123 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 interface Particle {
   x: number;
   y: number;
-  vx: number;
   vy: number;
   radius: number;
+  opacity: number;
+  fadeSpeed: number;
 }
 
 export function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -9999, y: -9999 });
-  const particlesRef = useRef<Particle[]>([]);
   const rafRef = useRef<number>(0);
+  const particlesRef = useRef<Particle[]>([]);
+  const dprRef = useRef(1);
+
+  const createParticle = useCallback((w: number, h: number, startFromBottom = false): Particle => ({
+    x: Math.random() * w,
+    y: startFromBottom ? h + Math.random() * 40 : Math.random() * h,
+    vy: -(0.15 + Math.random() * 0.35),
+    radius: 0.5 + Math.random() * 1.2,
+    opacity: 0,
+    fadeSpeed: 0.003 + Math.random() * 0.005,
+  }), []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dprRef.current = dpr;
+
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
 
-    // Create particles
-    const count = Math.min(80, Math.floor((window.innerWidth * window.innerHeight) / 15000));
-    particlesRef.current = Array.from({ length: count }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      radius: Math.random() * 1.5 + 0.5,
-    }));
+    // Fewer particles on mobile
+    const isMobile = window.innerWidth < 768;
+    const count = isMobile ? 25 : 50;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
 
-    const handleMouse = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-    };
-    const handleLeave = () => {
-      mouseRef.current = { x: -9999, y: -9999 };
-    };
-    window.addEventListener("mousemove", handleMouse);
-    window.addEventListener("mouseleave", handleLeave);
+    particlesRef.current = Array.from({ length: count }, () =>
+      createParticle(w, h, false)
+    );
+    // Stagger initial opacity so they don't all appear at once
+    particlesRef.current.forEach((p) => {
+      p.opacity = Math.random() * 0.5;
+    });
 
-    const CONNECTION_DIST = 120;
-    const MOUSE_DIST = 180;
+    let lastTime = 0;
+    const targetFPS = isMobile ? 30 : 60;
+    const frameInterval = 1000 / targetFPS;
 
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const animate = (timestamp: number) => {
+      const delta = timestamp - lastTime;
+      if (delta < frameInterval) {
+        rafRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastTime = timestamp - (delta % frameInterval);
+
+      const cw = window.innerWidth;
+      const ch = window.innerHeight;
+
+      ctx.clearRect(0, 0, cw, ch);
+
       const particles = particlesRef.current;
-      const mouse = mouseRef.current;
 
-      // Update & draw particles
-      for (const p of particles) {
-        p.x += p.vx;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
         p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        // Fade in then out
+        if (p.y > ch * 0.7) {
+          p.opacity = Math.min(p.opacity + p.fadeSpeed * 2, 0.6);
+        } else if (p.y < ch * 0.15) {
+          p.opacity = Math.max(p.opacity - p.fadeSpeed * 3, 0);
+        } else {
+          p.opacity = Math.min(p.opacity + p.fadeSpeed, 0.6);
+        }
+
+        // Reset when off screen or fully faded at top
+        if (p.y < -10 || (p.y < ch * 0.1 && p.opacity <= 0)) {
+          particles[i] = createParticle(cw, ch, true);
+        }
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "hsla(160, 84%, 39%, 0.5)";
+        ctx.fillStyle = `rgba(52, 211, 153, ${p.opacity})`;
         ctx.fill();
-      }
-
-      // Draw connections near mouse
-      for (let i = 0; i < particles.length; i++) {
-        const a = particles[i];
-        const dxM = a.x - mouse.x;
-        const dyM = a.y - mouse.y;
-        const distM = Math.sqrt(dxM * dxM + dyM * dyM);
-
-        if (distM < MOUSE_DIST) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const b = particles[j];
-            const dxB = b.x - mouse.x;
-            const dyB = b.y - mouse.y;
-            const distB = Math.sqrt(dxB * dxB + dyB * dyB);
-            if (distB > MOUSE_DIST) continue;
-
-            const dx = a.x - b.x;
-            const dy = a.y - b.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < CONNECTION_DIST) {
-              const opacity = (1 - dist / CONNECTION_DIST) * 0.35;
-              ctx.beginPath();
-              ctx.moveTo(a.x, a.y);
-              ctx.lineTo(b.x, b.y);
-              ctx.strokeStyle = `hsla(160, 84%, 45%, ${opacity})`;
-              ctx.lineWidth = 0.6;
-              ctx.stroke();
-            }
-          }
-        }
       }
 
       rafRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouse);
-      window.removeEventListener("mouseleave", handleLeave);
     };
-  }, []);
+  }, [createParticle]);
 
   return (
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ background: "transparent" }}
+      aria-hidden="true"
     />
   );
 }
