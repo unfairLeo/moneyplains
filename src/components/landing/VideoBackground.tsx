@@ -31,7 +31,7 @@ export function VideoBackground() {
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        src="http://googleusercontent.com/generated_video_content/8109664427892802908"
+        src="/fundo-oceano.mp4"
       />
 
       {/* Layer 2 — Dark overlay */}
