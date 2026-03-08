@@ -74,6 +74,7 @@ export default function LandingPage() {
         </div>
         <Link
           to="/login"
+          state={{ fromLanding: true }}
           className="px-5 py-2 rounded-lg border border-primary/50 text-primary text-sm font-medium hover:bg-primary/10 transition-all"
         >
           Entrar
