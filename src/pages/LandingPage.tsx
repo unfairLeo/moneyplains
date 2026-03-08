@@ -1,8 +1,7 @@
 import { Bot, Coins, TrendingUp, Wallet, Shield, PiggyBank, ArrowRight, Sparkles, BarChart3, Lock, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ParticleBackground } from "@/components/landing/ParticleBackground";
-import { AuroraBackground } from "@/components/landing/AuroraBackground";
+import { VideoBackground } from "@/components/landing/VideoBackground";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -57,10 +56,8 @@ function MiniChart() {
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-foreground overflow-x-hidden">
-      {/* Data particles rising effect */}
-      <ParticleBackground />
-      {/* Aurora mesh gradient blobs */}
-      <AuroraBackground />
+      {/* Video background with overlay and lantern effect */}
+      <VideoBackground />
 
       {/* Navbar */}
       <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-5 border-b border-white/5">
