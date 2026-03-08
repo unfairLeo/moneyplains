@@ -182,7 +182,7 @@ export default function LandingPage() {
             </FloatingCard>
 
             {/* Ambient circle */}
-            <div className="absolute w-[300px] h-[300px] rounded-full border border-primary/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" />
+            <div className="absolute w-[300px] h-[300px] rounded-full border border-primary/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
       </section>

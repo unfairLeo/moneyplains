@@ -32,13 +32,20 @@ function GoogleIcon() {
 export default function Login() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  const fromLanding = (location.state as { fromLanding?: boolean })?.fromLanding === true;
 
   useEffect(() => {
     if (!loading && user) {
       navigate("/dashboard", { replace: true });
+      return;
     }
-  }, [user, loading, navigate]);
+    if (!loading && !user && !fromLanding) {
+      navigate("/", { replace: true });
+    }
+  }, [user, loading, navigate, fromLanding]);
 
   const handleGoogleSignIn = async () => {
     try {
