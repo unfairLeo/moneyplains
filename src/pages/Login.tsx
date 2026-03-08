@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { lovable } from "@/integrations/lovable";
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
@@ -32,13 +32,20 @@ function GoogleIcon() {
 export default function Login() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  const fromLanding = (location.state as { fromLanding?: boolean })?.fromLanding === true;
 
   useEffect(() => {
     if (!loading && user) {
       navigate("/dashboard", { replace: true });
+      return;
     }
-  }, [user, loading, navigate]);
+    if (!loading && !user && !fromLanding) {
+      navigate("/", { replace: true });
+    }
+  }, [user, loading, navigate, fromLanding]);
 
   const handleGoogleSignIn = async () => {
     try {

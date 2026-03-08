@@ -74,6 +74,7 @@ export default function LandingPage() {
         </div>
         <Link
           to="/login"
+          state={{ fromLanding: true }}
           className="px-5 py-2 rounded-lg border border-primary/50 text-primary text-sm font-medium hover:bg-primary/10 transition-all"
         >
           Entrar
@@ -117,6 +118,7 @@ export default function LandingPage() {
             <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible" className="flex flex-wrap gap-4">
               <Link
                 to="/login"
+                state={{ fromLanding: true }}
                 className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-base hover:shadow-[0_0_30px_hsl(160_84%_39%/0.5)] hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 Começar Agora
@@ -181,7 +183,7 @@ export default function LandingPage() {
             </FloatingCard>
 
             {/* Ambient circle */}
-            <div className="absolute w-[300px] h-[300px] rounded-full border border-primary/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" />
+            <div className="absolute w-[300px] h-[300px] rounded-full border border-primary/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
       </section>

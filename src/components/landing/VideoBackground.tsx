@@ -35,7 +35,7 @@ export function VideoBackground() {
       />
 
       {/* Layer 2 — Dark overlay */}
-      <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-slate-950/75" />
 
       {/* Layer 3 — Cursor lantern (desktop only) */}
       {!isMobile && mouse.x > -1000 && (
