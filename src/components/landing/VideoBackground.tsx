@@ -20,11 +20,11 @@ export function VideoBackground() {
 
   const createParticle = useCallback((w: number, h: number, bottom = false): Particle => ({
     x: Math.random() * w,
-    y: bottom ? h + Math.random() * 20 : Math.random() * h,
-    vy: -(0.08 + Math.random() * 0.15), // Extremely slow upward movement
-    radius: 0.5 + Math.random() * 1, // 1-2px max
+    y: bottom ? h + Math.random() * 30 : Math.random() * h,
+    vy: -(0.03 + Math.random() * 0.08), // Ultra slow drift
+    radius: 0.4 + Math.random() * 0.8, // 0.4-1.2px - barely visible
     opacity: 0,
-    fadeSpeed: 0.002 + Math.random() * 0.003,
+    fadeSpeed: 0.001 + Math.random() * 0.002,
   }), []);
 
   useEffect(() => {
