@@ -9,8 +9,8 @@ interface Particle {
   fadeSpeed: number;
 }
 
-const MOUSE_RADIUS = 120;
-const REPEL_FORCE = 1.5;
+const MOUSE_RADIUS = 100;
+const REPEL_FORCE = 0.8;
 
 export function VideoBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -20,11 +20,11 @@ export function VideoBackground() {
 
   const createParticle = useCallback((w: number, h: number, bottom = false): Particle => ({
     x: Math.random() * w,
-    y: bottom ? h + Math.random() * 20 : Math.random() * h,
-    vy: -(0.08 + Math.random() * 0.15), // Extremely slow upward movement
-    radius: 0.5 + Math.random() * 1, // 1-2px max
+    y: bottom ? h + Math.random() * 30 : Math.random() * h,
+    vy: -(0.03 + Math.random() * 0.08), // Ultra slow drift
+    radius: 0.4 + Math.random() * 0.8, // 0.4-1.2px - barely visible
     opacity: 0,
-    fadeSpeed: 0.002 + Math.random() * 0.003,
+    fadeSpeed: 0.001 + Math.random() * 0.002,
   }), []);
 
   useEffect(() => {
@@ -57,14 +57,14 @@ export function VideoBackground() {
     window.addEventListener("mouseleave", handleLeave);
 
     const isMobile = window.innerWidth < 768;
-    const count = isMobile ? 40 : 80;
+    const count = isMobile ? 25 : 50; // Fewer particles for cleaner look
     const w = window.innerWidth;
     const h = window.innerHeight;
 
     // Initialize particles
     particlesRef.current = Array.from({ length: count }, () => {
       const p = createParticle(w, h, false);
-      p.opacity = Math.random() * 0.4;
+      p.opacity = Math.random() * 0.25; // Lower initial opacity
       return p;
     });
 
@@ -97,25 +97,25 @@ export function VideoBackground() {
           const dy = p.y - my;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MOUSE_RADIUS && dist > 0) {
-            const force = (1 - dist / MOUSE_RADIUS) * REPEL_FORCE;
-            p.x += (dx / dist) * force * 0.3;
-            p.y += (dy / dist) * force * 0.2;
+          const force = (1 - dist / MOUSE_RADIUS) * REPEL_FORCE;
+            p.x += (dx / dist) * force * 0.2;
+            p.y += (dy / dist) * force * 0.15;
           }
         }
 
-        // Slow upward drift
+        // Ultra slow upward drift
         p.y += p.vy;
 
-        // Gentle horizontal drift
-        p.x += Math.sin(timestamp * 0.0001 + i) * 0.02;
+        // Very gentle horizontal drift
+        p.x += Math.sin(timestamp * 0.00005 + i) * 0.01;
 
-        // Fade logic
-        if (p.y > ch * 0.8) {
-          p.opacity = Math.min(p.opacity + p.fadeSpeed * 2, 0.5);
-        } else if (p.y < ch * 0.1) {
-          p.opacity = Math.max(p.opacity - p.fadeSpeed * 3, 0);
+        // Fade logic - max opacity 0.35
+        if (p.y > ch * 0.85) {
+          p.opacity = Math.min(p.opacity + p.fadeSpeed * 1.5, 0.35);
+        } else if (p.y < ch * 0.08) {
+          p.opacity = Math.max(p.opacity - p.fadeSpeed * 4, 0);
         } else {
-          p.opacity = Math.min(p.opacity + p.fadeSpeed, 0.5);
+          p.opacity = Math.min(p.opacity + p.fadeSpeed, 0.35);
         }
 
         // Reset particle when it goes off screen
