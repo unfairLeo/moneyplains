@@ -132,6 +132,8 @@ export default {
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
         "typing": "typing 1.4s ease-in-out infinite",
         "slide-down": "slide-down 0.3s ease-out forwards",
+        "grid-pan": "grid-pan 20s linear infinite",
+        "grid-pan-slow": "grid-pan-slow 40s linear infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
