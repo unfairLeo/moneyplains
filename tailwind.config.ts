@@ -112,6 +112,14 @@ export default {
           from: { opacity: "0", height: "0", transform: "translateY(-10px)" },
           to: { opacity: "1", height: "var(--status-bar-height, 48px)", transform: "translateY(0)" },
         },
+        "grid-pan": {
+          from: { backgroundPosition: "0 0, 0 0" },
+          to: { backgroundPosition: "60px 60px, 60px 60px" },
+        },
+        "grid-pan-slow": {
+          from: { backgroundPosition: "0 0" },
+          to: { backgroundPosition: "30px 60px" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
