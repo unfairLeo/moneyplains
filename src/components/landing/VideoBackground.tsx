@@ -57,14 +57,14 @@ export function VideoBackground() {
     window.addEventListener("mouseleave", handleLeave);
 
     const isMobile = window.innerWidth < 768;
-    const count = isMobile ? 40 : 80;
+    const count = isMobile ? 25 : 50; // Fewer particles for cleaner look
     const w = window.innerWidth;
     const h = window.innerHeight;
 
     // Initialize particles
     particlesRef.current = Array.from({ length: count }, () => {
       const p = createParticle(w, h, false);
-      p.opacity = Math.random() * 0.4;
+      p.opacity = Math.random() * 0.25; // Lower initial opacity
       return p;
     });
 
