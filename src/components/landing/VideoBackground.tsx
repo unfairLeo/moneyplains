@@ -9,8 +9,8 @@ interface Particle {
   fadeSpeed: number;
 }
 
-const MOUSE_RADIUS = 120;
-const REPEL_FORCE = 1.5;
+const MOUSE_RADIUS = 100;
+const REPEL_FORCE = 0.8;
 
 export function VideoBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
