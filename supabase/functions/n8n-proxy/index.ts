@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
 
   try {
 // ATENÇÃO: Desfaça isso antes de fazer o commit para o GitHub!
-const N8N_WEBHOOK_URL = "https://ftleo.app.n8n.cloud/webhook/68819970-dbf1-49df-8e8b-d8c871e7301c";
+const N8N_WEBHOOK_URL = "https://leohar.app.n8n.cloud/webhook/68819970-dbf1-49df-8e8b-d8c871e7301c";
     if (!N8N_WEBHOOK_URL) {
       return new Response(
         JSON.stringify({ error: 'Serviço não configurado.' }),
