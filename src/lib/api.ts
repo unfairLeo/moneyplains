@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 
 // Timeout in milliseconds (60 seconds)
 const FETCH_TIMEOUT = 60000;
@@ -42,7 +41,7 @@ export function getFetchTimeout(): number {
 }
 
 /**
- * Safely make API request via Edge Function proxy
+ * Safely make API request directly to n8n webhook
  */
 export async function fetchWithValidation(
   query: string,
@@ -54,13 +53,22 @@ export async function fetchWithValidation(
   }
 
   try {
-    const { data, error } = await supabase.functions.invoke('n8n-proxy', {
-      body: { query: validation.data },
+    const N8N_WEBHOOK_URL = "https://leohar.app.n8n.cloud/webhook/68819970-dbf1-49df-8e8b-d8c871e7301c";
+
+    const response = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query: validation.data }),
+      signal: signal
     });
 
-    if (error) {
-      return { error: "Erro ao processar a solicitação. Tente novamente." };
+    if (!response.ok) {
+      return { error: "Erro ao processar a solicitação no n8n. Tente novamente." };
     }
+
+    const data = await response.json();
 
     if (data?.error) {
       return { error: data.error };

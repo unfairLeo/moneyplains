@@ -10,7 +10,6 @@ import { useConversation } from "@/contexts/ConversationContext";
 import { useToast } from "@/hooks/use-toast";
 import { BackendResponse, transformBackendResponse } from "@/types/api";
 import { validateQuery, getFetchTimeout } from "@/lib/api";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { WealthWidget } from "@/components/wealth/WealthWidget";
@@ -61,15 +60,22 @@ export function ChatView() {
     const timeoutId = setTimeout(() => controller.abort(), getFetchTimeout());
 
     try {
-      const { data: rawData, error: fnError } = await supabase.functions.invoke('n8n-proxy', {
-        body: { query: validatedQuery },
+      const responseAPI = await fetch("https://leohar.app.n8n.cloud/webhook/68819970-dbf1-49df-8e8b-d8c871e7301c", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: validatedQuery }),
+        signal: controller.signal
       });
 
       clearTimeout(timeoutId);
 
-      if (fnError) {
+      if (!responseAPI.ok) {
         throw new Error("server_error");
       }
+
+      const rawData = await responseAPI.json();
 
       if (rawData?.error) {
         throw new Error(rawData.error);

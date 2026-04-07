@@ -7,7 +7,6 @@ import HistorySidebar from "./HistorySidebar";
 import { useToast } from "@/hooks/use-toast";
 import { useConversationHistory } from "@/hooks/useConversationHistory";
 import { validateQuery, getFetchTimeout } from "@/lib/api";
-import { supabase } from "@/integrations/supabase/client";
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
 
 type ChatMessage = {
@@ -93,12 +92,22 @@ const Dashboard = () => {
     setError(null);
 
     try {
-      const { data: raw, error: fnError } = await supabase.functions.invoke('n8n-proxy', {
-        body: { query: validation.data },
+      const response = await fetch("https://leohar.app.n8n.cloud/webhook/68819970-dbf1-49df-8e8b-d8c871e7301c", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: validation.data })
       });
 
-      if (fnError || raw?.error) {
-        throw new Error("Erro ao processar a solicitação.");
+      if (!response.ok) {
+        throw new Error("Erro de comunicação com o servidor n8n.");
+      }
+
+      const raw = await response.json();
+
+      if (raw?.error) {
+        throw new Error("Erro ao processar a solicitação no fluxo.");
       }
       
       if (raw.net_worth !== undefined) {
@@ -177,7 +186,7 @@ const Dashboard = () => {
           
           <div className="flex-1 flex flex-col relative h-full w-full">
             
-            {/* --- CABEÇALHO LIMPO (Agora indentado corretamente) --- */}
+            {/* --- CABEÇALHO LIMPO --- */}
             <header className="flex items-center justify-between px-6 py-4 z-20 shrink-0 bg-transparent">
                 <div className="flex items-center gap-2">
                     <MoneyPlanLogo size="sm" />
@@ -284,8 +293,8 @@ const Dashboard = () => {
                                                 <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
                                             </linearGradient>
                                         </defs>
-                                        <Tooltip content={() => null} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }} />
-                                        <Area 
+                                        <Tooltip cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
+                                        <Area
                                             type="monotone" 
                                             dataKey="value" 
                                             stroke="#22c55e" 
