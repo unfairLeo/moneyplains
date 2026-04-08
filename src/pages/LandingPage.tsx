@@ -76,12 +76,15 @@ export default function LandingPage() {
           <a href="#cofre" className="hover:text-foreground transition-colors">Cofre</a>
           <a href="#footer" className="hover:text-foreground transition-colors">Contato</a>
         </div>
-        <Link
-          to="/login"
-          className="px-5 py-2 rounded-lg border border-primary/50 text-primary text-sm font-medium hover:bg-primary/10 transition-all"
-        >
-          Entrar
-        </Link>
+        <div className="flex items-center gap-3">
+          <PWAInstallButton />
+          <Link
+            to="/login"
+            className="px-5 py-2 rounded-lg border border-primary/50 text-primary text-sm font-medium hover:bg-primary/10 transition-all"
+          >
+            Entrar
+          </Link>
+        </div>
       </nav>
 
       {/* Hero Section */}
