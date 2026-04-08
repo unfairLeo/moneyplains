@@ -1,4 +1,5 @@
 import { Bot, Coins, TrendingUp, Wallet, Shield, PiggyBank, ArrowRight, Sparkles, BarChart3, Lock, ChevronRight } from "lucide-react";
+import { PWAInstallButton } from "@/components/pwa/PWAInstallPrompt";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ParticleBackground } from "@/components/landing/ParticleBackground";
