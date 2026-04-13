@@ -12,6 +12,7 @@ import { MissoesView } from "@/components/views/MissoesView";
 import { PersonalidadesView } from "@/components/views/PersonalidadesView";
 import { ConquistasView } from "@/components/views/ConquistasView";
 import { SettingsView } from "@/components/views/SettingsView";
+import { MoneyMarkDashboard } from "@/components/views/MoneyMarkDashboard";
 import Login from "@/pages/Login";
 import LandingPage from "@/pages/LandingPage";
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/personalidades" element={<PersonalidadesView />} />
               <Route path="/conquistas" element={<ConquistasView />} />
               <Route path="/configuracoes" element={<SettingsView />} />
+              <Route path="/moneymark" element={<MoneyMarkDashboard />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
