@@ -42,6 +42,7 @@ const App = () => (
               <Route path="/personalidades" element={<PersonalidadesView />} />
               <Route path="/conquistas" element={<ConquistasView />} />
               <Route path="/configuracoes" element={<SettingsView />} />
+              <Route path="/moneymark" element={<MoneyMarkDashboard />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
