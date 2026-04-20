@@ -19,7 +19,7 @@ function FloatingCard({ children, className = "", delay = 0 }: { children: React
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay, duration: 0.6, ease: "easeOut" }}
       className={`bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-lg ${className}`}
     >
       {children}
@@ -196,10 +196,10 @@ export default function LandingPage() {
       {/* Cofre Inteligente Section */}
       <section id="cofre" className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-16">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 grid md:grid-cols-2 gap-8 items-center"
         >
           {/* Left — simulated chart */}
@@ -285,8 +285,8 @@ export default function LandingPage() {
               key={i}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ delay: i * 0.2, duration: 0.6, ease: "easeOut" }}
               className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-primary/30 transition-colors group"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:shadow-[0_0_20px_hsl(160_84%_39%/0.3)] transition-shadow">
