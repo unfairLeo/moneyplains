@@ -1,4 +1,4 @@
-import { Bot, Coins, TrendingUp, Wallet, Shield, PiggyBank, ArrowRight, Sparkles, BarChart3, Lock, ChevronRight } from "lucide-react";
+import { Bot, Coins, TrendingUp, Wallet, Shield, ShieldCheck, PiggyBank, ArrowRight, Sparkles, BarChart3, Lock, ChevronRight } from "lucide-react";
 import { PWAInstallButton } from "@/components/pwa/PWAInstallPrompt";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -278,7 +278,7 @@ export default function LandingPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             { icon: Bot, title: "IA Financeira", desc: "Conselhos personalizados baseados nos seus hábitos reais de consumo." },
-            { icon: Shield, title: "100% Seguro", desc: "Seus dados financeiros protegidos com criptografia de ponta." },
+            { icon: ShieldCheck, title: "100% Seguro", desc: "Seus dados financeiros protegidos com criptografia de ponta." },
             { icon: TrendingUp, title: "Investimentos", desc: "Sugestões inteligentes para fazer seu dinheiro render mais." },
           ].map((item, i) => (
             <motion.div
