@@ -138,58 +138,41 @@ export default function LandingPage() {
             </motion.div>
           </div>
 
-          {/* Right column — floating cards composition */}
-          <div className="relative min-h-[400px] md:min-h-[480px] flex items-center justify-center">
-            {/* Main card */}
-            <FloatingCard className="absolute z-20 top-[10%] left-[5%] md:left-[10%] w-[260px]" delay={0.3}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
-                  <Wallet size={20} className="text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Patrimônio Estimado</p>
-                  <p className="font-display text-xl font-bold text-foreground">R$ 257.430<span className="text-sm text-muted-foreground">,00</span></p>
-                </div>
-              </div>
-              <MiniChart />
-              <div className="flex items-center gap-1 mt-2">
-                <TrendingUp size={14} className="text-primary" />
-                <span className="text-xs text-primary font-medium">+12,4% este mês</span>
-              </div>
-            </FloatingCard>
+          {/* Right column — premium 3D video showcase */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full flex items-center justify-center order-first md:order-last"
+          >
+            {/* Glow halo behind video */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/10 blur-3xl rounded-full" />
 
-            {/* AI Bot card */}
-            <FloatingCard className="absolute z-30 top-[55%] right-[0%] md:right-[5%] w-[220px]" delay={0.5}>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-9 h-9 rounded-full bg-secondary/15 flex items-center justify-center">
-                  <Bot size={18} className="text-secondary" />
-                </div>
-                <p className="text-sm font-medium text-foreground">IA MoneyPlan</p>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                "Você pode economizar <span className="text-primary font-medium">R$ 340</span> cortando assinaturas não usadas."
-              </p>
-            </FloatingCard>
+            <motion.div
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className="relative z-10 w-full max-w-[480px] aspect-square rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_0_60px_hsl(160_84%_39%/0.25)]"
+            >
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+                poster="/logo-renew.png"
+              >
+                <source
+                  src="https://cdn.pixabay.com/video/2024/03/15/204306-924698132_large.mp4"
+                  type="video/mp4"
+                />
+              </video>
+              {/* Subtle gradient overlay for blending */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+            </motion.div>
 
-            {/* Coins floating badge */}
-            <FloatingCard className="absolute z-10 top-[0%] right-[10%] md:right-[15%] !p-3" delay={0.7}>
-              <div className="flex items-center gap-2">
-                <Coins size={20} className="text-tier-gold" />
-                <span className="text-sm font-medium text-foreground">+R$ 1.200</span>
-              </div>
-            </FloatingCard>
-
-            {/* Shield badge */}
-            <FloatingCard className="absolute z-10 bottom-[5%] left-[0%] md:left-[5%] !p-3" delay={0.9}>
-              <div className="flex items-center gap-2">
-                <Shield size={18} className="text-primary" />
-                <span className="text-xs text-muted-foreground">Dados Protegidos</span>
-              </div>
-            </FloatingCard>
-
-            {/* Ambient circle */}
-            <div className="absolute w-[300px] h-[300px] rounded-full border border-primary/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse-slow" />
-          </div>
+            {/* Ambient pulsing ring */}
+            <div className="absolute w-[320px] h-[320px] rounded-full border border-primary/10 animate-pulse-slow pointer-events-none" />
+          </motion.div>
         </div>
       </section>
 
