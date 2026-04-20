@@ -4,6 +4,7 @@ import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import QueryInput from "./QueryInput";
 import MetricsGrid from "./MetricsGrid";
 import HistorySidebar from "./HistorySidebar";
+import { InvestmentSimulator } from "./InvestmentSimulator";
 import { useToast } from "@/hooks/use-toast";
 import { useConversationHistory } from "@/hooks/useConversationHistory";
 import { validateQuery, getFetchTimeout } from "@/lib/api";
