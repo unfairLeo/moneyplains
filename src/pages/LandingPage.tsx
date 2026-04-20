@@ -149,25 +149,37 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/10 blur-3xl rounded-full" />
 
             <motion.div
-              animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-10 w-full max-w-[480px] aspect-square rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_0_60px_hsl(160_84%_39%/0.25)]"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="relative z-10 w-full max-w-[480px]"
             >
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-                poster="/logo-renew.png"
+              <motion.div
+                animate={{ y: [0, -12, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="relative w-full aspect-square rounded-[2.5rem] overflow-hidden"
+                style={{
+                  boxShadow: "inset 0 0 80px 20px hsl(222 47% 4% / 0.9), 0 0 60px hsl(160 84% 39% / 0.2)",
+                }}
               >
-                <source
-                  src="https://cdn.pixabay.com/video/2024/03/15/204306-924698132_large.mp4"
-                  type="video/mp4"
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                >
+                  <source src="/cartao-rolando.mp4" type="video/mp4" />
+                </video>
+                {/* Edge softening mask — blends video into dark background */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at center, transparent 50%, hsl(222 47% 4% / 0.85) 100%)",
+                  }}
                 />
-              </video>
-              {/* Subtle gradient overlay for blending */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+              </motion.div>
             </motion.div>
 
             {/* Ambient pulsing ring */}
