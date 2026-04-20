@@ -4,6 +4,7 @@ import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import QueryInput from "./QueryInput";
 import MetricsGrid from "./MetricsGrid";
 import HistorySidebar from "./HistorySidebar";
+import { InvestmentSimulator } from "./InvestmentSimulator";
 import { useToast } from "@/hooks/use-toast";
 import { useConversationHistory } from "@/hooks/useConversationHistory";
 import { validateQuery, getFetchTimeout } from "@/lib/api";
@@ -308,6 +309,9 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* --- SIMULADOR DE INVESTIMENTOS --- */}
+                    <InvestmentSimulator />
 
                     {messages.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-10 text-center space-y-4 animate-in fade-in zoom-in duration-700 opacity-80">
