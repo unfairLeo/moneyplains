@@ -157,9 +157,13 @@ export default function LandingPage() {
               <motion.div
                 animate={{ y: [0, -12, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="relative w-full aspect-square rounded-[2.5rem] overflow-hidden"
+                className="relative w-full aspect-square"
                 style={{
-                  boxShadow: "inset 0 0 80px 20px hsl(222 47% 4% / 0.9), 0 0 60px hsl(160 84% 39% / 0.2)",
+                  borderRadius: "2rem",
+                  backgroundColor: "transparent",
+                  WebkitMaskImage: "radial-gradient(circle, black 40%, transparent 85%)",
+                  maskImage: "radial-gradient(circle, black 40%, transparent 85%)",
+                  filter: "drop-shadow(0 20px 40px hsl(160 84% 39% / 0.15))",
                 }}
               >
                 <video
@@ -168,17 +172,10 @@ export default function LandingPage() {
                   muted
                   playsInline
                   className="w-full h-full object-cover"
+                  style={{ backgroundColor: "transparent" }}
                 >
                   <source src="/cartao-rolando.mp4" type="video/mp4" />
                 </video>
-                {/* Edge softening mask — blends video into dark background */}
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      "radial-gradient(ellipse at center, transparent 50%, hsl(222 47% 4% / 0.85) 100%)",
-                  }}
-                />
               </motion.div>
             </motion.div>
 
