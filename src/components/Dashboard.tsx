@@ -310,7 +310,10 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {messages.length === 0 && (
+                    {/* --- SIMULADOR DE INVESTIMENTOS --- */}
+                    <InvestmentSimulator />
+
+
                         <div className="flex flex-col items-center justify-center py-10 text-center space-y-4 animate-in fade-in zoom-in duration-700 opacity-80">
                             <p className="text-sm text-gray-400 max-w-md leading-relaxed">
                                 Selecione um investimento acima ou digite <br/>
