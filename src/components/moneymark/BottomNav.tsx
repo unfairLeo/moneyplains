@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Home, BarChart3, Target, User, type LucideIcon } from "lucide-react";
+import { Home, BarChart3, Compass, User, type LucideIcon } from "lucide-react";
 
 export type TabId = "home" | "analytics" | "missions" | "profile";
 
@@ -12,7 +12,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { id: "home", label: "Início", icon: Home },
   { id: "analytics", label: "Análises", icon: BarChart3 },
-  { id: "missions", label: "Missões", icon: Target },
+  { id: "missions", label: "Odisséia", icon: Compass },
   { id: "profile", label: "Perfil", icon: User },
 ];
 
