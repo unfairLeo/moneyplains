@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MessageSquare, Target, Rocket, UserCircle, Trophy, Settings, type LucideIcon } from "lucide-react";
+import { MessageSquare, Target, Compass, UserCircle, Trophy, Settings, type LucideIcon } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface NavItem {
@@ -11,7 +11,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: "/dashboard", label: "Chat", icon: MessageSquare },
   { path: "/metas", label: "Metas", icon: Target },
-  { path: "/missoes", label: "Missões", icon: Rocket },
+  { path: "/missoes", label: "Odisséia", icon: Compass },
   { path: "/personalidades", label: "Personas", icon: UserCircle },
   { path: "/conquistas", label: "Conquistas", icon: Trophy },
   { path: "/configuracoes", label: "Ajustes", icon: Settings },
