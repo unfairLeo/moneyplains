@@ -1,10 +1,55 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, Shield, Coins, PiggyBank, Landmark, Zap, Download } from "lucide-react";
+import { TrendingUp, Shield, Coins, PiggyBank, Landmark, Zap, Download, Columns3, Feather, Anchor } from "lucide-react";
 import { NumberTicker } from "@/components/ui/NumberTicker";
 import { AuraRing } from "@/components/moneymark/AuraRing";
 import { MissionCard, type Mission } from "@/components/moneymark/MissionCard";
 import { PersonasSection } from "@/components/moneymark/PersonasSection";
+
+// ── Domínios de Riqueza (mitologic asset map) ──
+const dominios = [
+  {
+    id: "pilares",
+    name: "Pilares do Templo",
+    desc: "Renda fixa & reservas",
+    icon: Columns3,
+    value: 18420,
+    pct: 38,
+    gradient: "from-amber-600/30 via-amber-500/15 to-emerald-500/20",
+    accent: "text-amber-300",
+    ring: "border-amber-500/30",
+  },
+  {
+    id: "asas",
+    name: "Asas do Comércio",
+    desc: "Renda variável & ações",
+    icon: Feather,
+    value: 11230,
+    pct: 23,
+    gradient: "from-emerald-500/30 via-emerald-400/15 to-amber-500/15",
+    accent: "text-emerald-300",
+    ring: "border-emerald-500/30",
+  },
+  {
+    id: "correntes",
+    name: "Correntes Digitais",
+    desc: "Cripto & ativos digitais",
+    icon: Anchor,
+    value: 2800,
+    pct: 6,
+    gradient: "from-amber-700/25 via-yellow-600/15 to-emerald-600/20",
+    accent: "text-yellow-300",
+    ring: "border-yellow-600/30",
+  },
+];
+
+// ── Alocação das Ofertas (donut puro CSS) ──
+const ofertas = [
+  { label: "Templos", pct: 42, color: "hsl(45 80% 55%)" },      // ouro envelhecido
+  { label: "Mercados", pct: 28, color: "hsl(160 84% 45%)" },    // verde neon
+  { label: "Oráculos", pct: 18, color: "hsl(30 60% 45%)" },     // bronze antigo
+  { label: "Tributos", pct: 12, color: "hsl(180 50% 50%)" },    // ciano
+];
 
 const missions: Mission[] = [
   { id: 1, title: "Reserva de Emergência", desc: "Guardar 6 meses de gastos", icon: Shield, progress: 65, color: "from-cyan-500 to-blue-600" },
@@ -103,6 +148,124 @@ export function InicioView() {
 
       {/* ── Personas Section ── */}
       <PersonasSection points={points} selectedPersona={selectedPersona} onSelect={setSelectedPersona} />
+
+      {/* ── Seus Domínios de Riqueza ── */}
+      <div className="px-6 pb-2 pt-2">
+        <motion.div
+          className="flex items-center justify-between mb-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h3 className="text-sm font-semibold text-white/80 tracking-wide">
+            Seus <span className="bg-gradient-to-r from-amber-300 via-emerald-300 to-amber-400 bg-clip-text text-transparent">Domínios de Riqueza</span>
+          </h3>
+          <span className="text-[10px] text-white/30 font-medium uppercase tracking-widest">3 reinos</span>
+        </motion.div>
+        <div className="space-y-2.5">
+          {dominios.map((d, i) => {
+            const Icon = d.icon;
+            return (
+              <motion.div
+                key={d.id}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 + i * 0.06 }}
+                className={`relative overflow-hidden rounded-2xl border ${d.ring} bg-gradient-to-br ${d.gradient} backdrop-blur-xl p-3.5`}
+                style={{
+                  backgroundImage: `radial-gradient(ellipse at top left, rgba(255,215,140,0.06), transparent 60%), repeating-linear-gradient(115deg, rgba(255,255,255,0.015) 0 2px, transparent 2px 8px)`,
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl bg-black/40 border ${d.ring} flex items-center justify-center shrink-0`}>
+                    <Icon className={`w-5 h-5 ${d.accent}`} strokeWidth={1.5} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-white truncate">{d.name}</p>
+                    <p className="text-[10px] text-white/40 truncate">{d.desc}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold text-white tabular-nums">
+                      R$ {d.value.toLocaleString("pt-BR")}
+                    </p>
+                    <p className={`text-[10px] font-semibold ${d.accent}`}>{d.pct}%</p>
+                  </div>
+                </div>
+                {/* meter: verde neon → ouro envelhecido */}
+                <div className="mt-2.5 h-1 w-full rounded-full bg-black/40 overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{
+                      background: "linear-gradient(90deg, hsl(160 84% 45%) 0%, hsl(45 80% 55%) 100%)",
+                      boxShadow: "0 0 8px hsl(160 84% 45% / 0.5)",
+                    }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${d.pct * 2.2}%` }}
+                    transition={{ delay: 0.5 + i * 0.08, duration: 0.8, ease: "easeOut" }}
+                  />
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Alocação das Ofertas ── */}
+      <motion.div
+        className="px-6 pt-3 pb-1"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <div
+          className="rounded-2xl border border-amber-500/15 bg-gradient-to-br from-black/60 to-emerald-950/20 backdrop-blur-xl p-4"
+          style={{
+            backgroundImage: `radial-gradient(ellipse at center, rgba(255,200,120,0.04), transparent 70%), repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 6px)`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-white/80">
+              <span className="bg-gradient-to-r from-amber-300 to-emerald-300 bg-clip-text text-transparent">Alocação das Ofertas</span>
+            </h3>
+            <span className="text-[10px] text-white/30 uppercase tracking-widest">Mês</span>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* Donut */}
+            <div
+              className="relative w-24 h-24 rounded-full shrink-0"
+              style={{
+                background: `conic-gradient(${ofertas
+                  .map((o, i) => {
+                    const start = ofertas.slice(0, i).reduce((s, x) => s + x.pct, 0);
+                    return `${o.color} ${start}% ${start + o.pct}%`;
+                  })
+                  .join(", ")})`,
+                boxShadow: "0 0 24px rgba(255, 200, 100, 0.15), inset 0 0 12px rgba(0,0,0,0.6)",
+              }}
+            >
+              <div className="absolute inset-2 rounded-full bg-black/80 flex flex-col items-center justify-center border border-amber-500/15">
+                <span className="text-[9px] text-white/40 uppercase tracking-wider">Total</span>
+                <span className="text-xs font-bold text-amber-300 tabular-nums">100%</span>
+              </div>
+            </div>
+            {/* Legend */}
+            <ul className="flex-1 space-y-1.5">
+              {ofertas.map((o) => (
+                <li key={o.label} className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-sm"
+                      style={{ background: o.color, boxShadow: `0 0 6px ${o.color}` }}
+                    />
+                    <span className="text-white/70">{o.label}</span>
+                  </div>
+                  <span className="font-semibold text-white tabular-nums">{o.pct}%</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </motion.div>
 
       {/* ── Missions ── */}
       <div className="px-6 pb-4">
