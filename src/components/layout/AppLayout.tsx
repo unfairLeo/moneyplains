@@ -7,6 +7,7 @@ import { ConversationProvider } from "@/contexts/ConversationContext";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { MoneyPlanLogo } from "@/components/brand/MoneyPlanLogo";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { GlobalBottomNav } from "./GlobalBottomNav";
 
 function AppLayoutContent() {
   const isMobile = useIsMobile();
@@ -33,7 +34,7 @@ function AppLayoutContent() {
             </div>
           </header>
 
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto pb-24 md:pb-0">
             <img
               src={bgImage}
               alt=""
@@ -44,6 +45,7 @@ function AppLayoutContent() {
             </div>
           </main>
         </div>
+        <GlobalBottomNav />
       </div>
     </SidebarProvider>
   );
