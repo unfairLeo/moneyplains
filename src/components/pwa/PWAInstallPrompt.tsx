@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Download, X, Share, PlusSquare, ArrowDown, Smartphone, ShieldCheck, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
-const APK_URL = "/MoneyPlan.apk";
+// Link de download direto do Google Drive (convertido do link de compartilhamento)
+const APK_URL = "https://drive.google.com/uc?export=download&id=1KMZxKhBlDE21sYii0QVdzGpf_VlkCk30";
 
 function useIsIOS() {
   const [isIOS, setIsIOS] = useState(false);
@@ -135,10 +137,19 @@ function AndroidInstallSheet({ onClose }: { onClose: () => void }) {
         <a
           href={APK_URL}
           download="MoneyPlan.apk"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => {
+            toast.success("Download iniciado!", {
+              description:
+                "Após baixar, vá em Configurações e permita 'Instalar apps de fontes desconhecidas' para o seu navegador.",
+              duration: 8000,
+            });
+          }}
           className="mt-6 flex items-center justify-center gap-2 w-full px-5 py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-[0_0_30px_hsl(160_84%_39%/0.5)] active:scale-[0.98] transition-all duration-300"
         >
           <Download className="w-4 h-4" />
-          Baixar APK (1.5 MB)
+          Baixar APK
         </a>
 
         <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/70">
