@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Download, X, Share, PlusSquare, ArrowDown, Smartphone, ShieldCheck, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const APK_URL = "/MoneyPlan.apk";
+// Link de download direto do Google Drive (convertido do link de compartilhamento)
+const APK_URL = "https://drive.google.com/uc?export=download&id=1KMZxKhBlDE21sYii0QVdzGpf_VlkCk30";
 
 function useIsIOS() {
   const [isIOS, setIsIOS] = useState(false);
