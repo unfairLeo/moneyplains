@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { Download, X, Share, PlusSquare, ArrowDown, Smartphone, ShieldCheck, Settings } from "lucide-react";
+import { Download, X, Share, PlusSquare, ArrowDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
 
-// Link de download direto do Google Drive (convertido do link de compartilhamento)
-const APK_URL = "https://drive.google.com/uc?export=download&id=1KMZxKhBlDE21sYii0QVdzGpf_VlkCk30";
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
 
 function useIsIOS() {
   const [isIOS, setIsIOS] = useState(false);
@@ -28,13 +29,36 @@ function useIsStandalone() {
 export function PWAInstallButton() {
   const isIOS = useIsIOS();
   const isStandalone = useIsStandalone();
-  const [showSheet, setShowSheet] = useState<"android" | "ios" | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showIOSSheet, setShowIOSSheet] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
-  const handleInstallClick = useCallback(() => {
-    setShowSheet(isIOS ? "ios" : "android");
-  }, [isIOS]);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
 
-  if (isStandalone) return null;
+  const handleInstallClick = useCallback(async () => {
+    if (isIOS) {
+      setShowIOSSheet(true);
+      return;
+    }
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") setDismissed(true);
+      setDeferredPrompt(null);
+    }
+  }, [isIOS, deferredPrompt]);
+
+  if (isStandalone || dismissed) return null;
+
+  // Show button for iOS always (no beforeinstallprompt there), or when prompt is captured
+  if (!isIOS && !deferredPrompt) return null;
 
   return (
     <>
@@ -47,116 +71,10 @@ export function PWAInstallButton() {
       </button>
 
       <AnimatePresence>
-        {showSheet === "ios" && <IOSInstallSheet onClose={() => setShowSheet(null)} />}
-        {showSheet === "android" && <AndroidInstallSheet onClose={() => setShowSheet(null)} />}
+        {showIOSSheet && (
+          <IOSInstallSheet onClose={() => setShowIOSSheet(false)} />
+        )}
       </AnimatePresence>
-    </>
-  );
-}
-
-function AndroidInstallSheet({ onClose }: { onClose: () => void }) {
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-card border-t border-border p-6 pb-10 max-h-[85vh] overflow-y-auto"
-      >
-        <div className="flex justify-center mb-4">
-          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-        </div>
-
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-muted/50 text-muted-foreground hover:bg-muted transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 mb-3">
-            <Smartphone className="w-8 h-8 text-primary" />
-          </div>
-          <h3 className="text-xl font-bold text-foreground">
-            Instalar MoneyPlan<span className="text-primary">$</span>
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Baixe o APK oficial para Android
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-start gap-4 p-4 rounded-2xl bg-muted/30 border border-border">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 shrink-0">
-              <span className="text-sm font-bold text-primary">1</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground mb-1">Baixar o APK</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Toque no botão abaixo. O download de <span className="text-foreground font-medium">MoneyPlan.apk</span> será iniciado.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 p-4 rounded-2xl bg-muted/30 border border-border">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 shrink-0">
-              <span className="text-sm font-bold text-primary">2</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground mb-1 flex items-center gap-1.5">
-                <Settings className="w-3.5 h-3.5 text-primary" /> Permitir instalação
-              </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Se aparecer um aviso, vá em <span className="text-foreground font-medium">Configurações</span> e permita "Instalar apps desconhecidos" para o seu navegador.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 p-4 rounded-2xl bg-muted/30 border border-border">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 shrink-0">
-              <span className="text-sm font-bold text-primary">3</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground mb-1">Abrir e instalar</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Abra o arquivo baixado e toque em <span className="text-foreground font-medium">Instalar</span>. Pronto!
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <a
-          href={APK_URL}
-          download="MoneyPlan.apk"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => {
-            toast.success("Download iniciado!", {
-              description:
-                "Após baixar, vá em Configurações e permita 'Instalar apps de fontes desconhecidas' para o seu navegador.",
-              duration: 8000,
-            });
-          }}
-          className="mt-6 flex items-center justify-center gap-2 w-full px-5 py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-[0_0_30px_hsl(160_84%_39%/0.5)] active:scale-[0.98] transition-all duration-300"
-        >
-          <Download className="w-4 h-4" />
-          Baixar APK
-        </a>
-
-        <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/70">
-          <ShieldCheck className="w-3 h-3 text-primary/70" />
-          <span>Arquivo oficial e assinado pela MoneyPlan<span className="text-primary">$</span></span>
-        </div>
-      </motion.div>
     </>
   );
 }
