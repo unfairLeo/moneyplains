@@ -78,7 +78,7 @@ export default function LandingPage() {
         </div>
         <div className="flex items-center gap-3">
           <a
-            href="https://drive.google.com/file/d/1XncePfHO8qQ1uiRTa70AC369Jp8EIyit/view?usp=sharing"
+            href="/MoneyPlan.apk"
             download="MoneyPlan.apk"
             onClick={() => toast("O download começou! Assim que terminar, clique em ABRIR na notificação do seu celular para instalar o MoneyPlan$.", { duration: 6000 })}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-[0_0_25px_hsl(160_84%_39%/0.4)] hover:scale-105 active:scale-95 transition-all duration-300"

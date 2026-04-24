@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, Shield, Coins, PiggyBank, Landmark, Zap, Columns3, Feather, Anchor } from "lucide-react";
+import { TrendingUp, Shield, Coins, PiggyBank, Landmark, Zap, Download, Columns3, Feather, Anchor } from "lucide-react";
 import { NumberTicker } from "@/components/ui/NumberTicker";
 import { AuraRing } from "@/components/moneymark/AuraRing";
 import { MissionCard, type Mission } from "@/components/moneymark/MissionCard";
@@ -80,6 +80,10 @@ export function InicioView() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
+          <button className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] text-white/50 hover:bg-white/10 transition-colors">
+            <Download className="w-3 h-3" />
+            <span>Instalar</span>
+          </button>
           <div className="flex items-center gap-2">
             <div className="text-right">
               <p className="text-[11px] font-semibold text-white/80 leading-tight">Leonardo Ravache</p>
