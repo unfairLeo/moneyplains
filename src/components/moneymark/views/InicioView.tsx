@@ -80,10 +80,15 @@ export function InicioView() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] text-white/50 hover:bg-white/10 transition-colors">
+          <a
+            href="https://drive.google.com/uc?export=download&id=1iW0RLTk1r-UoajXdD3M81x4QKmWWYfLo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] text-white/50 hover:bg-white/10 transition-colors"
+          >
             <Download className="w-3 h-3" />
             <span>Instalar</span>
-          </button>
+          </a>
           <div className="flex items-center gap-2">
             <div className="text-right">
               <p className="text-[11px] font-semibold text-white/80 leading-tight">Leonardo Ravache</p>
