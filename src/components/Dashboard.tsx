@@ -195,6 +195,16 @@ const Dashboard = () => {
                         MoneyPlan<span className="text-primary">$</span>
                     </h1>
                 </div>
+                
+                {/* --- BOTÃO APK MANUAL QUE IGNORA O PWA --- */}
+                <a 
+                  href="https://drive.google.com/uc?export=download&id=1iW0RLTk1r-UoajXdD3M81x4QKmWWYfLo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary/10 border border-primary/30 text-primary font-bold text-sm hover:bg-primary/20 hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(34,197,94,0.15)]"
+                >
+                  Baixar App Oficial
+                </a>
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
